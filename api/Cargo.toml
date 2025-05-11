@@ -6,8 +6,10 @@ edition = "2024"
 [dependencies]
 anyhow.workspace = true
 axum.workspace = true
-config = { version = "0.15.11", default-features = false }
+config.workspace = true
 serde.workspace = true
 thiserror.workspace = true
 tokio.workspace = true
-tower-http = { version = "0.6.4", features = ["cors", "trace"] }
+tower-http.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true

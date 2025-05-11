@@ -21,6 +21,8 @@ use error::Error;
 use state::ApiState;
 use tokio::net::TcpListener;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
+use tracing::level_filters::LevelFilter;
+use tracing_subscriber::{EnvFilter, fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 type Result<T> = std::result::Result<T, Error>;
 
@@ -60,6 +62,19 @@ fn build(state: Arc<ApiState>) -> Router {
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::fmt::layer()
+                .pretty()
+                .with_timer(fmt::time::ChronoLocal::rfc_3339()),
+        )
+        .with(
+            EnvFilter::builder()
+                .with_default_directive(LevelFilter::DEBUG.into())
+                .from_env_lossy(),
+        )
+        .init();
+
     let state = Arc::new(ApiState::new().await.unwrap());
     let app = build(state);
     let listener = TcpListener::bind(SocketAddr::new([0, 0, 0, 0].into(), CONFIG.port))

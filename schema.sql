@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS reviews(
     rate real NOT NULL,
     content text NOT NULL,
     created_at timestamp NOT NULL DEFAULT now(),
+    update_at timestamp NOT NULL DEFAULT now(),
 
     PRIMARY KEY (book_id, user_id)
 );

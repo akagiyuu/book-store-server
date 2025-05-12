@@ -1,7 +1,8 @@
 use axum::{Json, http::StatusCode, response::IntoResponse};
 use serde::Serialize;
+use utoipa::ToSchema;
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct ErrorResponse {
     pub message: String,
 }

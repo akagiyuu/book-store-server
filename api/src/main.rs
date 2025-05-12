@@ -1,5 +1,6 @@
 mod config;
 mod controller;
+mod doc;
 mod error;
 mod state;
 
@@ -17,12 +18,15 @@ use axum::{
     routing::get,
 };
 use config::CONFIG;
+use doc::ApiDoc;
 use error::Error;
 use state::ApiState;
 use tokio::net::TcpListener;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::{EnvFilter, fmt, layer::SubscriberExt, util::SubscriberInitExt};
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
 type Result<T> = std::result::Result<T, Error>;
 
@@ -47,6 +51,9 @@ fn build(state: Arc<ApiState>) -> Router {
     let allow_origins = [CONFIG.cors_domain.parse::<HeaderValue>().unwrap()];
 
     let router = Router::new().route("/", get(controller::ping));
+
+    let router = router
+        .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()));
 
     let router = router.layer(TraceLayer::new_for_http()).layer(
         CorsLayer::new()

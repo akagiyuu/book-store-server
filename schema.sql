@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS authors(
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     name text NOT NULL,
     created_at timestamp NOT NULL DEFAULT now(),
-    update_at timestamp
+    update_at timestamp NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS categories(
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS categories(
     name character varying(64) NOT NULL,
     description text NOT NULL,
     created_at timestamp NOT NULL DEFAULT now(),
-    update_at timestamp
+    update_at timestamp NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS books(
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS books(
     title text NOT NULL,
     description text NOT NULL,
     created_at timestamp NOT NULL DEFAULT now(),
-    update_at timestamp
+    update_at timestamp NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS book_authors(
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS users(
     first_name character varying(32) NOT NULL,
     last_name character varying(32) NOT NULL,
     created_at timestamp NOT NULL DEFAULT now(),
-    update_at timestamp
+    update_at timestamp NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS reviews(

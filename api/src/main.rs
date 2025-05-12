@@ -25,6 +25,7 @@ use tokio::net::TcpListener;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::{EnvFilter, fmt, layer::SubscriberExt, util::SubscriberInitExt};
+use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 type Result<T> = std::result::Result<T, Error>;

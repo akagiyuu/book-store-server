@@ -50,7 +50,9 @@ const ALLOW_METHODS: [Method; 5] = [
 fn build(state: Arc<ApiState>) -> Router {
     let allow_origins = [CONFIG.cors_domain.parse::<HeaderValue>().unwrap()];
 
-    let router = Router::new().route("/", get(controller::ping));
+    let router = Router::new()
+        .route("/", get(controller::ping))
+        .merge(controller::auth::build());
 
     let router = router
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()));

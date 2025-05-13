@@ -38,10 +38,13 @@ CREATE TABLE IF NOT EXISTS book_categories(
     PRIMARY KEY (book_id, category_id)
 );
 
+CREATE TYPE role AS ENUM('user', 'admin');
+
 CREATE TABLE IF NOT EXISTS users(
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     email character varying(128) NOT NULL,
     password text NOT NULL,
+    role role NOT NULL DEFAULT 'user'::role,
     first_name character varying(32) NOT NULL,
     last_name character varying(32) NOT NULL,
     created_at timestamp NOT NULL DEFAULT now(),

@@ -7,6 +7,7 @@ anyhow = "1.0.98"
 axum = { version = "0.8.4", features = ["macros"] }
 config = { version = "0.15.11", default-features = false }
 database = { version = "0.1.0", path = "crates/database" }
+jsonwebtoken = "9.3.1"
 serde = { version = "1.0.219", features = ["derive"] }
 thiserror = "2.0.12"
 tokio = { version = "1.45.0", features = ["full"] }

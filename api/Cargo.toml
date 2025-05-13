@@ -8,6 +8,7 @@ anyhow.workspace = true
 axum.workspace = true
 config.workspace = true
 database.workspace = true
+jsonwebtoken.workspace = true
 serde.workspace = true
 thiserror.workspace = true
 tokio.workspace = true

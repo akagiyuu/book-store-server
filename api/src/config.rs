@@ -1,5 +1,6 @@
 use std::sync::LazyLock;
 
+use jsonwebtoken::{DecodingKey, EncodingKey};
 use serde::Deserialize;
 
 const fn default_port() -> u16 {
@@ -41,3 +42,9 @@ pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {
         .try_deserialize()
         .unwrap()
 });
+
+pub static JWT_ENCODING_KEY: LazyLock<EncodingKey> =
+    LazyLock::new(|| EncodingKey::from_secret(CONFIG.jwt_secret.as_bytes()));
+
+pub static JWT_DECODING_KEY: LazyLock<DecodingKey> =
+    LazyLock::new(|| DecodingKey::from_secret(CONFIG.jwt_secret.as_bytes()));

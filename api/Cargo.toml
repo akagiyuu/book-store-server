@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 anyhow.workspace = true
 axum.workspace = true
+axum-extra = { version = "0.10.1", features = ["typed-header"] }
 config.workspace = true
 database.workspace = true
 jsonwebtoken.workspace = true
@@ -17,3 +18,4 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 utoipa.workspace = true
 utoipa-swagger-ui.workspace = true
+uuid = { version = "1.16.0", features = ["v4", "fast-rng"] }

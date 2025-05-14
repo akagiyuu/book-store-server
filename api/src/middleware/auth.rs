@@ -16,19 +16,26 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::{Result, config::KEYS, error::Error, state::ApiState};
-
-#[derive(Debug, sqlx::Type, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-#[sqlx(type_name = "role", rename_all = "snake_case")]
-pub enum Role {
-    User,
-    Admin,
-}
+use crate::{
+    Result,
+    config::{CONFIG, KEYS},
+    error::Error,
+    state::ApiState,
+};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthContext {
     pub sub: Uuid,
     pub exp: u64,
+}
+
+impl AuthContext {
+    pub fn new(id: Uuid) -> Self {
+        Self {
+            sub: id,
+            exp: CONFIG.jwt_expired_in,
+        }
+    }
 }
 
 impl FromRequestParts<Arc<ApiState>> for AuthContext {
@@ -47,6 +54,13 @@ impl FromRequestParts<Arc<ApiState>> for AuthContext {
 
         Ok(token.claims)
     }
+}
+
+#[derive(Debug, sqlx::Type, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[sqlx(type_name = "role", rename_all = "snake_case")]
+pub enum Role {
+    User,
+    Admin,
 }
 
 async fn get_role(id: Uuid, database: &PgPool) -> Result<Role> {

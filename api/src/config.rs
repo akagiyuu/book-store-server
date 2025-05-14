@@ -19,6 +19,14 @@ const fn default_jwt_expired_in() -> u64 {
     26 * 60 * 60
 }
 
+const fn default_bcrypt_cost() -> u32 {
+    10
+}
+
+const fn default_bcrypt_salt() -> [u8; 16] {
+    [0; 16]
+}
+
 #[derive(Deserialize)]
 pub struct Config {
     pub database_url: String,
@@ -34,6 +42,12 @@ pub struct Config {
 
     #[serde(default = "default_jwt_expired_in")]
     pub jwt_expired_in: u64,
+
+    #[serde(default = "default_bcrypt_cost")]
+    pub bcrypt_cost: u32,
+
+    #[serde(default = "default_bcrypt_salt")]
+    pub bcrypt_salt: [u8; 16],
 }
 
 pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {

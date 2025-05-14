@@ -27,9 +27,10 @@ impl Modify for SecurityAddon {
 #[openapi(
     paths(
         controller::ping,
-        controller::auth::register
+        controller::auth::register,
+        controller::auth::login,
     ),
-     modifiers(&SecurityAddon),
+    modifiers(&SecurityAddon),
     components(schemas(crate::error::ErrorResponse))
 )]
 pub struct ApiDoc;

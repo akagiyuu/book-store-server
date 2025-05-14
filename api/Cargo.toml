@@ -11,7 +11,7 @@ config.workspace = true
 database.workspace = true
 jsonwebtoken.workspace = true
 serde.workspace = true
-sqlx = { version = "0.8.5", features = ["runtime-tokio", "postgres", "chrono"] }
+sqlx = { version = "0.8.5", features = ["runtime-tokio", "postgres", "chrono", "uuid"] }
 thiserror.workspace = true
 tokio.workspace = true
 tower-http.workspace = true
@@ -19,4 +19,4 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 utoipa.workspace = true
 utoipa-swagger-ui.workspace = true
-uuid = { version = "1.16.0", features = ["v4", "fast-rng"] }
+uuid = { version = "1.16.0", features = ["v4", "fast-rng", "serde"] }

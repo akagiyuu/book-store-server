@@ -45,8 +45,12 @@ pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {
         .unwrap()
 });
 
-pub static JWT_ENCODING_KEY: LazyLock<EncodingKey> =
-    LazyLock::new(|| EncodingKey::from_secret(CONFIG.jwt_secret.as_bytes()));
+pub struct Keys {
+    pub encoding: EncodingKey,
+    pub decoding: DecodingKey,
+}
 
-pub static JWT_DECODING_KEY: LazyLock<DecodingKey> =
-    LazyLock::new(|| DecodingKey::from_secret(CONFIG.jwt_secret.as_bytes()));
+pub static KEYS: LazyLock<Keys> = LazyLock::new(|| Keys {
+    encoding: EncodingKey::from_secret(CONFIG.jwt_secret.as_bytes()),
+    decoding: DecodingKey::from_secret(CONFIG.jwt_secret.as_bytes()),
+});

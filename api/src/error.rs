@@ -9,6 +9,8 @@ pub struct ErrorResponse {
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    #[error("Unknown error: {message}")]
+    Auth { message: String },
     #[error("Unknown error: {0}")]
     Other(#[from] anyhow::Error),
 }
@@ -16,6 +18,7 @@ pub enum Error {
 impl IntoResponse for Error {
     fn into_response(self) -> axum::response::Response {
         let (status, response) = match self {
+            Error::Auth { message } => (StatusCode::UNAUTHORIZED, ErrorResponse { message }),
             Error::Other(error) => (
                 StatusCode::BAD_REQUEST,
                 ErrorResponse {

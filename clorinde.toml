@@ -1,4 +1,0 @@
-use-workspace-deps = true
-
-[package]
-name = "database"

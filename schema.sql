@@ -42,7 +42,7 @@ CREATE TYPE role AS ENUM('user', 'admin');
 
 CREATE TABLE IF NOT EXISTS users(
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    email character varying(128) NOT NULL,
+    email character varying(128) NOT NULL UNIQUE,
     password text NOT NULL,
     role role NOT NULL DEFAULT 'user'::role,
     first_name character varying(32) NOT NULL,

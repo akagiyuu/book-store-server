@@ -27,6 +27,10 @@ const fn default_bcrypt_salt() -> [u8; 16] {
     [0; 16]
 }
 
+fn default_google_authorized_redirect_url() -> String {
+    "http://127.0.0.1:3000/auth/google/authorized".to_string()
+}
+
 #[derive(Deserialize)]
 pub struct Config {
     pub database_url: String,
@@ -48,6 +52,13 @@ pub struct Config {
 
     #[serde(default = "default_bcrypt_salt")]
     pub bcrypt_salt: [u8; 16],
+
+    pub google_client_id: String,
+
+    pub google_client_secret: String,
+
+    #[serde(default = "default_google_authorized_redirect_url")]
+    pub google_authorized_redirect_url: String,
 }
 
 pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {

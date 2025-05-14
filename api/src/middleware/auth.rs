@@ -11,7 +11,7 @@ use axum_extra::{
     TypedHeader,
     headers::{Authorization, authorization::Bearer},
 };
-use jsonwebtoken::Validation;
+use jsonwebtoken::{Header, Validation};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -35,6 +35,12 @@ impl AuthContext {
             sub: id,
             exp: CONFIG.jwt_expired_in,
         }
+    }
+
+    pub fn encode(&self) -> Result<String> {
+        let token = jsonwebtoken::encode(&Header::default(), self, &KEYS.encoding).unwrap();
+
+        Ok(token)
     }
 }
 

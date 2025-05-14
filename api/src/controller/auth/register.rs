@@ -44,7 +44,5 @@ pub async fn register(
     .await?;
 
     let auth_ctx = AuthContext::new(id);
-    let token = auth_ctx.encode()?;
-
-    Ok(token)
+    auth_ctx.encode()
 }

@@ -6,7 +6,7 @@ use utoipa::ToSchema;
 
 use crate::database;
 use crate::middleware::AuthContext;
-use crate::{state::ApiState, Result};
+use crate::{Result, state::ApiState};
 
 #[derive(Deserialize, ToSchema)]
 pub struct LoginRequest {
@@ -31,7 +31,5 @@ pub async fn login(
     }
 
     let auth_ctx = AuthContext::new(user.id);
-    let token = auth_ctx.encode()?;
-
-    Ok(token)
+    auth_ctx.encode()
 }

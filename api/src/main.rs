@@ -2,9 +2,8 @@ mod config;
 mod controller;
 mod doc;
 mod error;
-mod state;
-mod extractor;
 mod middleware;
+mod state;
 
 use std::{net::SocketAddr, sync::Arc};
 

@@ -4,7 +4,7 @@ use crate::{Result, config::CONFIG};
 
 #[derive(Debug)]
 pub struct ApiState {
-    database: PgPool,
+    pub database: PgPool,
 }
 
 impl ApiState {

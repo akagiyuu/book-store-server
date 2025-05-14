@@ -12,22 +12,23 @@ use axum_extra::{
     headers::{Authorization, authorization::Bearer},
 };
 use jsonwebtoken::Validation;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{Result, config::KEYS, error::Error, state::ApiState};
 
-#[derive(Debug, sqlx::Type, PartialEq, Eq, PartialOrd, Ord, Deserialize)]
+#[derive(Debug, sqlx::Type, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[sqlx(type_name = "role", rename_all = "snake_case")]
 pub enum Role {
     User,
     Admin,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct AuthContext {
     pub sub: Uuid,
     pub role: Role,
+    pub exp: u64,
 }
 
 impl FromRequestParts<Arc<ApiState>> for AuthContext {

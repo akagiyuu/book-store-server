@@ -1,5 +1,6 @@
 mod login;
 mod register;
+mod google;
 
 use std::sync::Arc;
 

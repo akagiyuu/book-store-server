@@ -1,14 +1,12 @@
 use std::sync::Arc;
 
 use axum::{Json, extract::State};
-use jsonwebtoken::Header;
 use serde::Deserialize;
 use utoipa::ToSchema;
 
-use crate::config::KEYS;
 use crate::database;
 use crate::middleware::AuthContext;
-use crate::{Result, config::CONFIG, state::ApiState};
+use crate::{state::ApiState, Result};
 
 #[derive(Deserialize, ToSchema)]
 pub struct LoginRequest {

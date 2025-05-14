@@ -21,6 +21,8 @@ const fn default_jwt_expired_in() -> u64 {
 
 #[derive(Deserialize)]
 pub struct Config {
+    pub database_url: String,
+
     #[serde(default = "default_port")]
     pub port: u16,
 

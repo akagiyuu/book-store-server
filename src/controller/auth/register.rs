@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
 use axum::{Json, extract::State};
+use axum_extra::extract::CookieJar;
+use axum_extra::extract::cookie::Cookie;
 use serde::Deserialize;
 use utoipa::ToSchema;
 
@@ -24,8 +26,9 @@ pub struct RegisterRequest {
 )]
 pub async fn register(
     State(state): State<Arc<ApiState>>,
+    jar: CookieJar,
     Json(request): Json<RegisterRequest>,
-) -> Result<String> {
+) -> Result<CookieJar> {
     let password = bcrypt::hash_with_salt(
         request.password.as_bytes(),
         CONFIG.bcrypt_cost,
@@ -44,5 +47,7 @@ pub async fn register(
     .await?;
 
     let auth_ctx = AuthContext::new(id);
-    auth_ctx.encode()
+    let token = auth_ctx.encode()?;
+
+    Ok(jar.add(Cookie::new(&CONFIG.token_cookie, token)))
 }

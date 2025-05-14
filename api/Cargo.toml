@@ -9,7 +9,6 @@ axum.workspace = true
 axum-extra = { version = "0.10.1", features = ["typed-header"] }
 bcrypt = "0.17.0"
 config.workspace = true
-database.workspace = true
 jsonwebtoken.workspace = true
 oauth2 = "5.0.0"
 rand = "0.9.1"

@@ -15,11 +15,11 @@ pub async fn is_existed(email: &str, database: &PgPool) -> Result<bool> {
 }
 
 pub struct User {
-    id: Uuid,
-    password: String,
+    pub id: Uuid,
+    pub password: String,
 }
 
-async fn get(email: &str, database: &PgPool) -> Result<User> {
+pub async fn get(email: &str, database: &PgPool) -> Result<User> {
     let password = sqlx::query_as!(
         User,
         "SELECT id, password FROM users WHERE email = $1 LIMIT 1",

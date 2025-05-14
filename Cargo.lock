@@ -62,7 +62,6 @@ dependencies = [
  "axum-extra",
  "bcrypt",
  "config",
- "database",
  "jsonwebtoken",
  "oauth2",
  "rand 0.9.1",

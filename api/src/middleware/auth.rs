@@ -3,7 +3,7 @@ use std::sync::Arc;
 use axum::{
     RequestPartsExt,
     body::Body,
-    extract::FromRequestParts,
+    extract::{FromRequestParts, State},
     http::{Request, Response, request::Parts},
     middleware::Next,
 };
@@ -13,6 +13,7 @@ use axum_extra::{
 };
 use jsonwebtoken::Validation;
 use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::{Result, config::KEYS, error::Error, state::ApiState};
@@ -27,7 +28,6 @@ pub enum Role {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthContext {
     pub sub: Uuid,
-    pub role: Role,
     pub exp: u64,
 }
 
@@ -49,11 +49,28 @@ impl FromRequestParts<Arc<ApiState>> for AuthContext {
     }
 }
 
+async fn get_role(id: Uuid, database: &PgPool) -> Result<Role> {
+    let role = sqlx::query_scalar!(
+        r#"SELECT role as "role!: Role" FROM users WHERE id = $1 LIMIT 1"#,
+        id
+    )
+    .fetch_one(database)
+    .await
+    .unwrap();
+
+    Ok(role)
+}
+
 pub async fn auth_required(
     role: Role,
-) -> impl AsyncFn(AuthContext, Request<Body>, Next) -> Result<Response<Body>> {
-    async move |auth_ctx: AuthContext, req: Request<Body>, next: Next| -> Result<Response<Body>> {
-        if auth_ctx.role >= role {
+) -> impl AsyncFn(AuthContext, State<Arc<ApiState>>, Request<Body>, Next) -> Result<Response<Body>>
+{
+    async move |auth_ctx: AuthContext,
+                State(state): State<Arc<ApiState>>,
+                req: Request<Body>,
+                next: Next|
+                -> Result<Response<Body>> {
+        if get_role(auth_ctx.sub, &state.database).await? >= role {
             return Err(Error::Auth {
                 message: "Unauthorized".to_string(),
             });

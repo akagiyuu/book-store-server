@@ -52,7 +52,6 @@ pub async fn register(
 
     let auth_ctx = AuthContext {
         sub: user.id,
-        role: user.role,
         exp: CONFIG.jwt_expired_in,
     };
     let token = jsonwebtoken::encode(&Header::default(), &auth_ctx, &KEYS.encoding).unwrap();

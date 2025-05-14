@@ -11,6 +11,10 @@ fn default_cors_domain() -> String {
     "http://localhost:3000".to_string()
 }
 
+fn default_token_cookie() -> String {
+    "token".to_string()
+}
+
 fn default_jwt_secret() -> String {
     "secret".to_string()
 }
@@ -40,6 +44,9 @@ pub struct Config {
 
     #[serde(default = "default_cors_domain")]
     pub cors_domain: String,
+
+    #[serde(default = "default_token_cookie")]
+    pub token_cookie: String,
 
     #[serde(default = "default_jwt_secret")]
     pub jwt_secret: String,

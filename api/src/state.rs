@@ -1,14 +1,15 @@
 use oauth2::{
-    AuthUrl, Client, ClientId, ClientSecret, EmptyExtraTokenFields, EndpointNotSet, EndpointSet,
+    AuthUrl, ClientId, ClientSecret, EmptyExtraTokenFields, EndpointNotSet, EndpointSet,
     RedirectUrl, RevocationErrorResponseType, StandardErrorResponse, StandardRevocableToken,
     StandardTokenIntrospectionResponse, StandardTokenResponse, TokenUrl,
     basic::{BasicClient, BasicErrorResponseType, BasicTokenType},
+    reqwest,
 };
 use sqlx::PgPool;
 
 use crate::{Result, config::CONFIG};
 
-type GoogleOAuthClient = Client<
+type GoogleOAuthClient = oauth2::Client<
     StandardErrorResponse<BasicErrorResponseType>,
     StandardTokenResponse<EmptyExtraTokenFields, BasicTokenType>,
     StandardTokenIntrospectionResponse<EmptyExtraTokenFields, BasicTokenType>,
@@ -25,6 +26,7 @@ type GoogleOAuthClient = Client<
 pub struct ApiState {
     pub database: PgPool,
     pub google_oauth_client: GoogleOAuthClient,
+    pub http_client: reqwest::Client,
 }
 
 impl ApiState {
@@ -43,9 +45,15 @@ impl ApiState {
                 RedirectUrl::new(CONFIG.google_authorized_redirect_url.clone()).unwrap(),
             );
 
+        let http_client = reqwest::ClientBuilder::new()
+            .redirect(reqwest::redirect::Policy::none())
+            .build()
+            .unwrap();
+
         Ok(Self {
             database,
             google_oauth_client,
+            http_client,
         })
     }
 }

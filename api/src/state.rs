@@ -3,7 +3,6 @@ use oauth2::{
     RedirectUrl, RevocationErrorResponseType, StandardErrorResponse, StandardRevocableToken,
     StandardTokenIntrospectionResponse, StandardTokenResponse, TokenUrl,
     basic::{BasicClient, BasicErrorResponseType, BasicTokenType},
-    reqwest,
 };
 use sqlx::PgPool;
 

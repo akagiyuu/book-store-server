@@ -4,6 +4,7 @@ mod doc;
 mod error;
 mod middleware;
 mod state;
+mod util;
 
 use std::{net::SocketAddr, sync::Arc};
 

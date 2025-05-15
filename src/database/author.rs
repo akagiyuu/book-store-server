@@ -12,6 +12,7 @@ pub async fn insert(params: &Insert, executor: impl PgExecutor<'_>) -> Result<Uu
         r#"
             INSERT INTO authors(name)
             VALUES ($1)
+            ON CONFLICT DO NOTHING
             RETURNING id
         "#,
         params.name,

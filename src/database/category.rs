@@ -13,6 +13,7 @@ pub async fn insert(params: &Insert, executor: impl PgExecutor<'_>) -> Result<Uu
         r#"
             INSERT INTO categories(name, description)
             VALUES ($1, $2)
+            ON CONFLICT DO NOTHING
             RETURNING id
         "#,
         params.name,

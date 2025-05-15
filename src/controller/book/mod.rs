@@ -1,5 +1,6 @@
 mod get;
 mod get_all;
+mod insert;
 
 use std::sync::Arc;
 
@@ -9,9 +10,11 @@ use crate::state::ApiState;
 
 pub use get::*;
 pub use get_all::*;
+pub use insert::*;
 
 pub fn build() -> Router<Arc<ApiState>> {
     Router::new()
+        .route("/book", routing::post(insert))
         .route("/book", routing::get(get_all))
         .route("/book/{id}", routing::get(get))
 }

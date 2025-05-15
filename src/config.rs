@@ -32,7 +32,7 @@ const fn default_bcrypt_salt() -> [u8; 16] {
 }
 
 fn default_google_authorized_redirect_url() -> String {
-    "http://127.0.0.1:3000/auth/google/authorized".to_string()
+    "http://localhost:3000/auth/google/authorized".to_string()
 }
 
 #[derive(Deserialize)]

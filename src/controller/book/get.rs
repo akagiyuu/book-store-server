@@ -12,7 +12,17 @@ use crate::{
     state::ApiState,
 };
 
-#[utoipa::path(get, tag = "Book", path = "/book/:id")]
+#[utoipa::path(
+    get,
+    tag = "Book",
+    path = "/book/:id",
+    params(
+        ("id" = Uuid, Path, description = "Book id")
+    ),
+    responses(
+        (status = 200, body = Book)
+    )
+)]
 pub async fn get(State(state): State<Arc<ApiState>>, Path(id): Path<Uuid>) -> Result<Json<Book>> {
     let book = database::book::get(id, &state.database).await?;
 

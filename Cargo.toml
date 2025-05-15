@@ -22,6 +22,6 @@ tokio = { version = "1.45.0", features = ["full"] }
 tower-http = { version = "0.6.4", features = ["cors", "trace"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["fmt", "chrono", "env-filter"] }
-utoipa = "5.3.1"
+utoipa = { version = "5.3.1", features = ["chrono", "uuid"] }
 utoipa-swagger-ui = { version = "9.0.1", features = ["axum"] }
 uuid = { version = "1.16.0", features = ["v4", "fast-rng", "serde"] }

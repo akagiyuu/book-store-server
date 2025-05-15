@@ -8,7 +8,15 @@ use uuid::Uuid;
 
 use crate::{Result, database::book, state::ApiState};
 
-#[utoipa::path(patch, tag = "Book", path = "/book")]
+#[utoipa::path(
+    patch,
+    tag = "Book",
+    path = "/book",
+    params(
+        ("id" = Uuid, Path, description = "Book id")
+    ),
+    request_body = book::Update
+)]
 pub async fn update(
     State(state): State<Arc<ApiState>>,
     Path(id): Path<Uuid>,

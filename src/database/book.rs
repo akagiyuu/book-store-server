@@ -2,13 +2,14 @@ use async_stream::try_stream;
 use futures::{Stream, StreamExt};
 use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, PgTransaction};
+use utoipa::ToSchema;
 use uuid::Uuid;
 
 use crate::Result;
 
 use super::{author, category};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct Insert {
     pub isbn: String,
     pub title: String,
@@ -89,7 +90,7 @@ pub async fn insert(params: Insert, pool: &PgPool) -> Result<Uuid> {
     Ok(id)
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct Book {
     pub id: Uuid,
     pub isbn: String,
@@ -189,7 +190,7 @@ async fn update_category(
     Ok(())
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct Update {
     pub isbn: Option<String>,
     pub title: Option<String>,

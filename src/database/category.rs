@@ -1,10 +1,11 @@
 use serde::{Deserialize, Serialize};
 use sqlx::PgExecutor;
+use utoipa::ToSchema;
 use uuid::Uuid;
 
 use crate::Result;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct Insert {
     pub name: String,
     pub description: String,
@@ -28,7 +29,7 @@ pub async fn insert(params: &Insert, executor: impl PgExecutor<'_>) -> Result<Uu
     Ok(id)
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct Category {
     pub id: Uuid,
     pub name: String,

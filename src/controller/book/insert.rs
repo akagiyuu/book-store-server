@@ -4,7 +4,12 @@ use axum::{Json, extract::State};
 
 use crate::{Result, database::book, state::ApiState};
 
-#[utoipa::path(post, tag = "Book", path = "/book")]
+#[utoipa::path(
+    post,
+    tag = "Book",
+    path = "/book",
+    request_body = book::Insert,
+)]
 pub async fn insert(
     State(state): State<Arc<ApiState>>,
     Json(req): Json<book::Insert>,

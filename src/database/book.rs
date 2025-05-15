@@ -1,12 +1,14 @@
 use async_stream::try_stream;
 use futures::{Stream, StreamExt};
-use sqlx::{PgExecutor, PgPool, PgTransaction, Postgres, Transaction};
+use serde::{Deserialize, Serialize};
+use sqlx::{PgPool, PgTransaction};
 use uuid::Uuid;
 
 use crate::Result;
 
 use super::{author, category};
 
+#[derive(Deserialize)]
 pub struct Insert {
     pub isbn: String,
     pub title: String,
@@ -87,6 +89,7 @@ pub async fn insert(params: Insert, pool: &PgPool) -> Result<Uuid> {
     Ok(id)
 }
 
+#[derive(Serialize)]
 pub struct Book {
     pub id: Uuid,
     pub isbn: String,

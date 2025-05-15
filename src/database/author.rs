@@ -1,8 +1,10 @@
+use serde::{Deserialize, Serialize};
 use sqlx::PgExecutor;
 use uuid::Uuid;
 
 use crate::Result;
 
+#[derive(Deserialize)]
 pub struct Insert {
     pub name: String,
 }
@@ -24,6 +26,7 @@ pub async fn insert(params: &Insert, executor: impl PgExecutor<'_>) -> Result<Uu
     Ok(id)
 }
 
+#[derive(Serialize)]
 pub struct Author {
     pub id: Uuid,
     pub name: String,

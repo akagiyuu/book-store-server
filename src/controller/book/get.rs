@@ -1,9 +1,8 @@
 use std::sync::Arc;
 
 use axum::{
-    Json, Router,
+    Json,
     extract::{Path, State},
-    routing,
 };
 use uuid::Uuid;
 
@@ -18,8 +17,4 @@ pub async fn get(State(state): State<Arc<ApiState>>, Path(id): Path<Uuid>) -> Re
     let book = database::book::get(id, &state.database).await?;
 
     Ok(Json(book))
-}
-
-pub fn build() -> Router<Arc<ApiState>> {
-    Router::new().route("/book/{id}", routing::get(get))
 }

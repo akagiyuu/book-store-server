@@ -2,14 +2,14 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS authors(
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name text NOT NULL,
+    name text UNIQUE NOT NULL,
     created_at timestamp NOT NULL DEFAULT now(),
     update_at timestamp NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS categories(
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name character varying(64) NOT NULL,
+    name character varying(64) UNIQUE NOT NULL,
     description text NOT NULL,
     created_at timestamp NOT NULL DEFAULT now(),
     update_at timestamp NOT NULL DEFAULT now()

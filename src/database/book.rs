@@ -10,17 +10,17 @@ use crate::Result;
 use super::{author, category};
 
 #[derive(Deserialize, ToSchema)]
-pub struct Insert {
+pub struct InsertBook {
     pub isbn: String,
     pub title: String,
     pub description: String,
-    pub authors: Vec<author::Insert>,
-    pub categories: Vec<category::Insert>,
+    pub authors: Vec<author::InsertAuthor>,
+    pub categories: Vec<category::InsertCategory>,
 }
 
 async fn insert_author(
     id: Uuid,
-    author: &author::Insert,
+    author: &author::InsertAuthor,
     transaction: &mut PgTransaction<'_>,
 ) -> Result<()> {
     let author_id = author::insert(author, &mut **transaction).await.unwrap();
@@ -39,7 +39,7 @@ async fn insert_author(
 
 async fn insert_category(
     id: Uuid,
-    category: &category::Insert,
+    category: &category::InsertCategory,
     transaction: &mut PgTransaction<'_>,
 ) -> Result<()> {
     let category_id = category::insert(category, &mut **transaction)
@@ -58,7 +58,7 @@ async fn insert_category(
     Ok(())
 }
 
-pub async fn insert(params: Insert, pool: &PgPool) -> Result<Uuid> {
+pub async fn insert(params: InsertBook, pool: &PgPool) -> Result<Uuid> {
     let mut transaction = pool.begin().await.unwrap();
 
     let id = sqlx::query_scalar!(
@@ -158,7 +158,7 @@ pub fn get_all(pool: &PgPool) -> impl Stream<Item = Result<Book>> {
 
 async fn update_author(
     id: Uuid,
-    authors: &[author::Insert],
+    authors: &[author::InsertAuthor],
     transaction: &mut PgTransaction<'_>,
 ) -> Result<()> {
     sqlx::query!("DELETE FROM book_authors WHERE book_id = $1", id)
@@ -175,7 +175,7 @@ async fn update_author(
 
 async fn update_category(
     id: Uuid,
-    categories: &[category::Insert],
+    categories: &[category::InsertCategory],
     transaction: &mut PgTransaction<'_>,
 ) -> Result<()> {
     sqlx::query!("DELETE FROM book_categories WHERE book_id = $1", id)
@@ -191,15 +191,15 @@ async fn update_category(
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct Update {
+pub struct UpdateBook {
     pub isbn: Option<String>,
     pub title: Option<String>,
     pub description: Option<String>,
-    pub authors: Option<Vec<author::Insert>>,
-    pub categories: Option<Vec<category::Insert>>,
+    pub authors: Option<Vec<author::InsertAuthor>>,
+    pub categories: Option<Vec<category::InsertCategory>>,
 }
 
-pub async fn update(id: Uuid, params: &Update, pool: &PgPool) -> Result<()> {
+pub async fn update(id: Uuid, params: &UpdateBook, pool: &PgPool) -> Result<()> {
     let mut transaction = pool.begin().await.unwrap();
 
     sqlx::query!(

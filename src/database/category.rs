@@ -6,12 +6,12 @@ use uuid::Uuid;
 use crate::Result;
 
 #[derive(Deserialize, ToSchema)]
-pub struct Insert {
+pub struct InsertCategory {
     pub name: String,
     pub description: String,
 }
 
-pub async fn insert(params: &Insert, executor: impl PgExecutor<'_>) -> Result<Uuid> {
+pub async fn insert(params: &InsertCategory, executor: impl PgExecutor<'_>) -> Result<Uuid> {
     let id = sqlx::query_scalar!(
         r#"
             INSERT INTO categories(name, description)
@@ -75,12 +75,12 @@ pub async fn get_all(executor: impl PgExecutor<'_>) -> Result<Vec<Category>> {
     Ok(category)
 }
 
-pub struct Update {
+pub struct UpdateCategory {
     pub name: Option<String>,
     pub description: Option<String>,
 }
 
-pub async fn update(id: Uuid, params: &Update, executor: impl PgExecutor<'_>) -> Result<()> {
+pub async fn update(id: Uuid, params: &UpdateCategory, executor: impl PgExecutor<'_>) -> Result<()> {
     sqlx::query!(
         r#"
             UPDATE categories

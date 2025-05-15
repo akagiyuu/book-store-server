@@ -15,7 +15,7 @@ pub struct BookInsertRequest {
     categories: Vec<Uuid>,
 }
 
-#[utoipa::path(post, tag = "Book", path = "/book/:id")]
+#[utoipa::path(post, tag = "Book", path = "/book")]
 pub async fn insert(
     State(state): State<Arc<ApiState>>,
     Json(req): Json<BookInsertRequest>,

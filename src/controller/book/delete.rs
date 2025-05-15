@@ -11,7 +11,8 @@ use crate::{Result, database, state::ApiState};
     path = "/book/:id",
     params(
         ("id" = Uuid, Path, description = "Book id")
-    )
+    ),
+    security(("jwt_token" = []))
 )]
 pub async fn delete(State(state): State<Arc<ApiState>>, Path(id): Path<Uuid>) -> Result<()> {
     database::book::delete(id, &state.database).await?;

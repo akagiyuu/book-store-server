@@ -9,6 +9,7 @@ use crate::{Result, database::book, state::ApiState};
     tag = "Book",
     path = "/book",
     request_body = book::Insert,
+    security(("jwt_token" = []))
 )]
 pub async fn insert(
     State(state): State<Arc<ApiState>>,

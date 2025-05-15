@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use axum::{
     RequestPartsExt,
-    body::Body,
-    extract::{FromRequestParts, State},
-    http::{Request, Response, request::Parts},
+    extract::{FromRequestParts, Request, State},
+    http::request::Parts,
     middleware::Next,
+    response::Response,
 };
 use axum_extra::{
     TypedHeader,
@@ -81,21 +81,24 @@ async fn get_role(id: Uuid, database: &PgPool) -> Result<Role> {
     Ok(role)
 }
 
-pub async fn auth_required(
-    role: Role,
-) -> impl AsyncFn(AuthContext, State<Arc<ApiState>>, Request<Body>, Next) -> Result<Response<Body>>
-{
-    async move |auth_ctx: AuthContext,
-                State(state): State<Arc<ApiState>>,
-                req: Request<Body>,
-                next: Next|
-                -> Result<Response<Body>> {
-        if get_role(auth_ctx.sub, &state.database).await? >= role {
-            return Err(Error::Auth {
-                message: "Unauthorized".to_string(),
-            });
-        }
+macro_rules! auth_required {
+    ($name:ident, $role: expr) => {
+        pub async fn $name(
+            auth_ctx: AuthContext,
+            State(state): State<Arc<ApiState>>,
+            req: Request,
+            next: Next,
+        ) -> Result<Response> {
+            if get_role(auth_ctx.sub, &state.database).await? >= $role {
+                return Err(Error::Auth {
+                    message: "Unauthorized".to_string(),
+                });
+            }
 
-        Ok(next.run(req).await)
-    }
+            Ok(next.run(req).await)
+        }
+    };
 }
+
+auth_required!(admin_required, Role::Admin);
+auth_required!(user_required, Role::User);

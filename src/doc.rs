@@ -3,7 +3,7 @@ use utoipa::{
     openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme},
 };
 
-use crate::controller;
+use crate::{controller, database};
 
 struct SecurityAddon;
 
@@ -36,6 +36,17 @@ impl Modify for SecurityAddon {
         controller::book::delete,
     ),
     modifiers(&SecurityAddon),
-    components(schemas(crate::error::ErrorResponse))
+    components(schemas(
+        crate::error::ErrorResponse,
+        controller::auth::LoginRequest,
+        controller::auth::RegisterRequest,
+        database::author::Author,
+        database::author::Insert,
+        database::category::Category,
+        database::category::Insert,
+        database::book::Book,
+        database::book::Insert,
+        database::book::Update
+    ))
 )]
 pub struct ApiDoc;

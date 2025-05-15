@@ -15,7 +15,8 @@ use crate::{Result, database::book, state::ApiState};
     params(
         ("id" = Uuid, Path, description = "Book id")
     ),
-    request_body = book::Update
+    request_body = book::Update,
+    security(("jwt_token" = []))
 )]
 pub async fn update(
     State(state): State<Arc<ApiState>>,

@@ -1,3 +1,4 @@
+mod delete;
 mod get;
 mod get_all;
 mod insert;
@@ -8,6 +9,7 @@ use axum::{Router, routing};
 
 use crate::state::ApiState;
 
+pub use delete::*;
 pub use get::*;
 pub use get_all::*;
 pub use insert::*;
@@ -17,4 +19,5 @@ pub fn build() -> Router<Arc<ApiState>> {
         .route("/book", routing::post(insert))
         .route("/book", routing::get(get_all))
         .route("/book/{id}", routing::get(get))
+        .route("/book/{id}", routing::delete(delete))
 }

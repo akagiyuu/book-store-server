@@ -1,48 +1,73 @@
-use sqlx::PgPool;
+use sqlx::PgExecutor;
 use uuid::Uuid;
 
 use crate::Result;
 
-pub struct Author {
-    pub id: Uuid,
+pub struct Insert {
     pub name: String,
 }
 
-pub async fn insert(name: &str, database: &PgPool) -> Result<Uuid> {
+pub async fn insert(params: &Insert, executor: impl PgExecutor<'_>) -> Result<Uuid> {
     let id = sqlx::query_scalar!(
         r#"
             INSERT INTO authors(name)
             VALUES ($1)
             RETURNING id
         "#,
-        name,
+        params.name,
     )
-    .fetch_one(database)
+    .fetch_one(executor)
     .await
     .unwrap();
 
     Ok(id)
 }
 
-pub async fn get(id: Uuid, database: &PgPool) -> Result<Author> {
-    let category = sqlx::query_as!(Author, "SELECT id, name FROM authors WHERE id = $1", id)
-        .fetch_one(database)
+pub struct Author {
+    pub id: Uuid,
+    pub name: String,
+}
+
+pub async fn get(id: Uuid, executor: impl PgExecutor<'_>) -> Result<Author> {
+    let author = sqlx::query_as!(Author, "SELECT id, name FROM authors WHERE id = $1", id)
+        .fetch_one(executor)
         .await
         .unwrap();
 
-    Ok(category)
+    Ok(author)
 }
 
-pub async fn get_all(database: &PgPool) -> Result<Vec<Author>> {
-    let category = sqlx::query_as!(Author, "SELECT id, name FROM authors",)
-        .fetch_all(database)
+pub async fn get_by_book_id(book_id: Uuid, executor: impl PgExecutor<'_>) -> Result<Vec<Author>> {
+    let authors = sqlx::query_as!(
+        Author,
+        r#"
+            SELECT id, name
+            FROM authors
+            WHERE id IN (SELECT author_id FROM book_authors WHERE id = $1)
+        "#,
+        book_id
+    )
+    .fetch_all(executor)
+    .await
+    .unwrap();
+
+    Ok(authors)
+}
+
+pub async fn get_all(executor: impl PgExecutor<'_>) -> Result<Vec<Author>> {
+    let author = sqlx::query_as!(Author, "SELECT id, name FROM authors",)
+        .fetch_all(executor)
         .await
         .unwrap();
 
-    Ok(category)
+    Ok(author)
 }
 
-pub async fn update(id: Uuid, name: Option<&str>, database: &PgPool) -> Result<()> {
+pub struct Update {
+    name: Option<String>,
+}
+
+pub async fn update(id: Uuid, params: &Update, executor: impl PgExecutor<'_>) -> Result<()> {
     sqlx::query!(
         r#"
             UPDATE authors
@@ -52,18 +77,18 @@ pub async fn update(id: Uuid, name: Option<&str>, database: &PgPool) -> Result<(
             WHERE id = $1
         "#,
         id,
-        name,
+        params.name,
     )
-    .execute(database)
+    .execute(executor)
     .await
     .unwrap();
 
     Ok(())
 }
 
-pub async fn delete(id: Uuid, database: &PgPool) -> Result<()> {
+pub async fn delete(id: Uuid, executor: impl PgExecutor<'_>) -> Result<()> {
     sqlx::query!("DELETE FROM authors WHERE id = $1", id)
-        .execute(database)
+        .execute(executor)
         .await
         .unwrap();
 

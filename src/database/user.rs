@@ -1,12 +1,12 @@
-use sqlx::PgPool;
+use sqlx::PgExecutor;
 use uuid::Uuid;
 
 use crate::{Result, util::generate_random_string};
 
-pub async fn is_existed(email: &str, database: &PgPool) -> Result<bool> {
+pub async fn is_existed(email: &str, executor: impl PgExecutor<'_>) -> Result<bool> {
     let is_existed =
         sqlx::query_scalar!("SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)", email)
-            .fetch_one(database)
+            .fetch_one(executor)
             .await
             .unwrap()
             .unwrap_or(false);
@@ -19,13 +19,13 @@ pub struct User {
     pub password: String,
 }
 
-pub async fn get(email: &str, database: &PgPool) -> Result<User> {
+pub async fn get(email: &str, executor: impl PgExecutor<'_>) -> Result<User> {
     let password = sqlx::query_as!(
         User,
         "SELECT id, password FROM users WHERE email = $1 LIMIT 1",
         email
     )
-    .fetch_one(database)
+    .fetch_one(executor)
     .await
     .unwrap();
 
@@ -37,7 +37,7 @@ pub async fn insert(
     password: Option<String>,
     first_name: &str,
     last_name: &str,
-    database: &PgPool,
+    executor: impl PgExecutor<'_>,
 ) -> Result<Uuid> {
     let password = password.unwrap_or_else(|| generate_random_string(10));
 
@@ -52,7 +52,7 @@ pub async fn insert(
         first_name,
         last_name,
     )
-    .fetch_one(database)
+    .fetch_one(executor)
     .await
     .unwrap();
 

@@ -1,26 +1,27 @@
 use async_stream::try_stream;
 use futures::{Stream, StreamExt};
-use serde::Serialize;
-use sqlx::{PgPool, Postgres, Transaction};
+use sqlx::{PgExecutor, PgPool, PgTransaction, Postgres, Transaction};
 use uuid::Uuid;
 
 use crate::Result;
 
-#[derive(Serialize)]
-pub struct Book {
-    pub id: Uuid,
+use super::{author, category};
+
+pub struct Insert {
     pub isbn: String,
     pub title: String,
     pub description: String,
-    pub authors: Vec<String>,
-    pub categories: Vec<String>,
+    pub authors: Vec<author::Insert>,
+    pub categories: Vec<category::Insert>,
 }
 
 async fn insert_author(
     id: Uuid,
-    author_id: Uuid,
-    transaction: &mut Transaction<'static, Postgres>,
+    author: &author::Insert,
+    transaction: &mut PgTransaction<'_>,
 ) -> Result<()> {
+    let author_id = author::insert(author, &mut **transaction).await.unwrap();
+
     sqlx::query!(
         "INSERT INTO book_authors(book_id, author_id) VALUES($1, $2)",
         id,
@@ -35,9 +36,13 @@ async fn insert_author(
 
 async fn insert_category(
     id: Uuid,
-    category_id: Uuid,
-    transaction: &mut Transaction<'static, Postgres>,
+    category: &category::Insert,
+    transaction: &mut PgTransaction<'_>,
 ) -> Result<()> {
+    let category_id = category::insert(category, &mut **transaction)
+        .await
+        .unwrap();
+
     sqlx::query!(
         "INSERT INTO book_categories(book_id, category_id) VALUES($1, $2)",
         id,
@@ -50,15 +55,8 @@ async fn insert_category(
     Ok(())
 }
 
-pub async fn insert(
-    isbn: &str,
-    title: &str,
-    description: &str,
-    authors: Vec<Uuid>,
-    categories: Vec<Uuid>,
-    database: &PgPool,
-) -> Result<Uuid> {
-    let mut transaction = database.begin().await.unwrap();
+pub async fn insert(params: Insert, pool: &PgPool) -> Result<Uuid> {
+    let mut transaction = pool.begin().await.unwrap();
 
     let id = sqlx::query_scalar!(
         r#"
@@ -66,65 +64,40 @@ pub async fn insert(
             VALUES ($1, $2, $3)
             RETURNING id
         "#,
-        isbn,
-        title,
-        description
+        params.isbn,
+        params.title,
+        params.description
     )
     .fetch_one(&mut *transaction)
     .await
     .unwrap();
 
-    for author in authors {
+    for author in &params.authors {
         insert_author(id, author, &mut transaction).await.unwrap();
     }
 
-    for category in categories {
+    for category in &params.categories {
         insert_category(id, category, &mut transaction)
             .await
             .unwrap();
     }
 
+    transaction.commit().await.unwrap();
+
     Ok(id)
 }
 
-async fn get_author(
-    id: Uuid,
-    transaction: &mut Transaction<'static, Postgres>,
-) -> Result<Vec<String>> {
-    let authors = sqlx::query_scalar!(
-        r#"
-            SELECT name FROM authors
-            WHERE id IN (SELECT author_id FROM book_authors WHERE book_id = $1)
-        "#,
-        id
-    )
-    .fetch_all(&mut **transaction)
-    .await
-    .unwrap();
-
-    Ok(authors)
+pub struct Book {
+    pub id: Uuid,
+    pub isbn: String,
+    pub title: String,
+    pub description: String,
+    pub authors: Vec<author::Author>,
+    pub categories: Vec<category::Category>,
 }
 
-async fn get_category(
-    id: Uuid,
-    transaction: &mut Transaction<'static, Postgres>,
-) -> Result<Vec<String>> {
-    let categories = sqlx::query_scalar!(
-        r#"
-            SELECT name FROM categories
-            WHERE id IN (SELECT category_id FROM book_categories WHERE book_id = $1)
-        "#,
-        id
-    )
-    .fetch_all(&mut **transaction)
-    .await
-    .unwrap();
-
-    Ok(categories)
-}
-
-pub async fn get(id: Uuid, database: &PgPool) -> Result<Book> {
-    let mut transaction = database.begin().await.unwrap();
+pub async fn get(id: Uuid, pool: &PgPool) -> Result<Book> {
+    let mut transaction = pool.begin().await.unwrap();
 
     let book_raw = sqlx::query!(
         "SELECT id, isbn, title, description FROM books WHERE id = $1",
@@ -134,8 +107,10 @@ pub async fn get(id: Uuid, database: &PgPool) -> Result<Book> {
     .await
     .unwrap();
 
-    let authors = get_author(id, &mut transaction).await.unwrap();
-    let categories = get_category(id, &mut transaction).await.unwrap();
+    let authors = author::get_by_book_id(id, &mut *transaction).await?;
+    let categories = category::get_by_book_id(id, &mut *transaction)
+        .await
+        .unwrap();
 
     transaction.commit().await.unwrap();
 
@@ -149,18 +124,19 @@ pub async fn get(id: Uuid, database: &PgPool) -> Result<Book> {
     })
 }
 
-pub fn get_all(database: &PgPool) -> impl Stream<Item = Result<Book>> {
-    let mut books_raw =
-        sqlx::query!("SELECT id, isbn, title, description FROM books",).fetch(database);
+pub fn get_all(pool: &PgPool) -> impl Stream<Item = Result<Book>> {
+    let mut books_raw = sqlx::query!("SELECT id, isbn, title, description FROM books",).fetch(pool);
 
     try_stream! {
         while let Some(book_raw) = books_raw.next().await {
             let book_raw = book_raw.unwrap();
 
-            let mut transaction = database.begin().await.unwrap();
+            let mut transaction = pool.begin().await.unwrap();
 
-            let authors = get_author(book_raw.id, &mut transaction).await.unwrap();
-            let categories = get_category(book_raw.id, &mut transaction).await.unwrap();
+            let authors = author::get_by_book_id(book_raw.id, &mut *transaction).await?;
+            let categories = category::get_by_book_id(book_raw.id, &mut *transaction)
+                .await
+                .unwrap();
 
             transaction.commit().await.unwrap();
 
@@ -176,33 +152,35 @@ pub fn get_all(database: &PgPool) -> impl Stream<Item = Result<Book>> {
     }
 }
 
-pub async fn update_author(id: Uuid, authors: Vec<Uuid>, database: &PgPool) -> Result<()> {
-    let mut transaction = database.begin().await.unwrap();
-
+async fn update_author(
+    id: Uuid,
+    authors: &[author::Insert],
+    transaction: &mut PgTransaction<'_>,
+) -> Result<()> {
     sqlx::query!("DELETE FROM book_authors WHERE book_id = $1", id)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await
         .unwrap();
 
     for author in authors {
-        insert_author(id, author, &mut transaction).await.unwrap();
+        insert_author(id, author, transaction).await.unwrap();
     }
 
     Ok(())
 }
 
-pub async fn update_category(id: Uuid, categories: Vec<Uuid>, database: &PgPool) -> Result<()> {
-    let mut transaction = database.begin().await.unwrap();
-
+async fn update_category(
+    id: Uuid,
+    categories: &[category::Insert],
+    transaction: &mut PgTransaction<'_>,
+) -> Result<()> {
     sqlx::query!("DELETE FROM book_categories WHERE book_id = $1", id)
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await
         .unwrap();
 
     for category in categories {
-        insert_category(id, category, &mut transaction)
-            .await
-            .unwrap();
+        insert_category(id, category, transaction).await.unwrap();
     }
 
     Ok(())

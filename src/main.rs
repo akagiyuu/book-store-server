@@ -1,11 +1,11 @@
 mod config;
 mod controller;
+mod database;
 mod doc;
 mod error;
 mod middleware;
 mod state;
 mod util;
-mod database;
 
 use std::{net::SocketAddr, sync::Arc};
 

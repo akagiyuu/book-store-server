@@ -29,6 +29,7 @@ impl Modify for SecurityAddon {
         controller::ping,
         controller::auth::register,
         controller::auth::login,
+        controller::book::get,
     ),
     modifiers(&SecurityAddon),
     components(schemas(crate::error::ErrorResponse))

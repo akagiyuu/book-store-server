@@ -1,10 +1,12 @@
 use async_stream::try_stream;
 use futures::{Stream, StreamExt};
+use serde::Serialize;
 use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
 
 use crate::Result;
 
+#[derive(Serialize)]
 pub struct Book {
     pub id: Uuid,
     pub isbn: String,

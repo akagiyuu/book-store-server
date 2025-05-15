@@ -189,13 +189,18 @@ async fn update_category(
     Ok(())
 }
 
-pub async fn update(
-    id: Uuid,
-    isbn: Option<&str>,
-    title: Option<&str>,
-    description: Option<&str>,
-    database: &PgPool,
-) -> Result<()> {
+#[derive(Deserialize)]
+pub struct Update {
+    pub isbn: Option<String>,
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub authors: Option<Vec<author::Insert>>,
+    pub categories: Option<Vec<category::Insert>>,
+}
+
+pub async fn update(id: Uuid, params: &Update, pool: &PgPool) -> Result<()> {
+    let mut transaction = pool.begin().await.unwrap();
+
     sqlx::query!(
         r#"
             UPDATE books
@@ -207,13 +212,25 @@ pub async fn update(
             WHERE id = $1
         "#,
         id,
-        isbn,
-        title,
-        description
+        params.isbn,
+        params.title,
+        params.description
     )
-    .execute(database)
+    .execute(&mut *transaction)
     .await
     .unwrap();
+
+    if let Some(authors) = &params.authors {
+        update_author(id, authors, &mut transaction).await.unwrap();
+    }
+
+    if let Some(categories) = &params.categories {
+        update_category(id, categories, &mut transaction)
+            .await
+            .unwrap();
+    }
+
+    transaction.commit().await.unwrap();
 
     Ok(())
 }

@@ -59,7 +59,8 @@ pub async fn update(
             UPDATE categories
             SET
                 name = COALESCE(name, $2),
-                description = COALESCE(description, $3)
+                description = COALESCE(description, $3),
+                update_at = now()
             WHERE id = $1
         "#,
         id,

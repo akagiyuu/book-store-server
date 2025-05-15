@@ -46,7 +46,9 @@ pub async fn update(id: Uuid, name: Option<&str>, database: &PgPool) -> Result<(
     sqlx::query!(
         r#"
             UPDATE authors
-            SET name = COALESCE(name, $2)
+            SET 
+                name = COALESCE(name, $2),
+                update_at = now()
             WHERE id = $1
         "#,
         id,

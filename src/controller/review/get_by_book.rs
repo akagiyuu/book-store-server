@@ -8,7 +8,7 @@ use uuid::Uuid;
 
 use crate::{
     Result,
-    database::{self, author::Author, review::Review},
+    database::{self, review::Review},
     state::ApiState,
 };
 

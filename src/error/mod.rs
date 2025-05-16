@@ -32,18 +32,22 @@ impl From<TypedHeaderRejection> for Error {
 
 impl IntoResponse for Error {
     fn into_response(self) -> axum::response::Response {
-        let (status, response) = match self {
-            Error::Database(_) => (StatusCode::BAD_REQUEST, ErrorResponse {
-                message: "Failed to execute query".to_string(),
-            }),
-            Error::Auth(error) => (StatusCode::UNAUTHORIZED, ErrorResponse {
-                message: error.to_string(),
-            }),
-            Error::Other(error) => (StatusCode::BAD_REQUEST, ErrorResponse {
-                message: error.to_string(),
-            }),
-        };
-
-        (status, Json(response)).into_response()
+        match self {
+            Error::Database(_) => (
+                StatusCode::BAD_REQUEST,
+                Json(ErrorResponse {
+                    message: "Failed to execute query".to_string(),
+                }),
+            )
+                .into_response(),
+            Error::Auth(error) => error.into_response(),
+            Error::Other(error) => (
+                StatusCode::BAD_REQUEST,
+                Json(ErrorResponse {
+                    message: error.to_string(),
+                }),
+            )
+                .into_response(),
+        }
     }
 }

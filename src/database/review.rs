@@ -1,9 +1,7 @@
 use serde::{Deserialize, Serialize};
-use sqlx::PgExecutor;
+use sqlx::{PgExecutor, Result};
 use utoipa::ToSchema;
 use uuid::Uuid;
-
-use crate::Result;
 
 #[derive(Deserialize, ToSchema)]
 pub struct InsertReview {
@@ -28,8 +26,7 @@ pub async fn insert(
         params.content,
     )
     .execute(executor)
-    .await
-    .unwrap();
+    .await?;
 
     Ok(())
 }
@@ -41,7 +38,7 @@ pub struct Review {
 }
 
 pub async fn get(book_id: Uuid, user_id: Uuid, executor: impl PgExecutor<'_>) -> Result<Review> {
-    let review = sqlx::query_as!(
+    sqlx::query_as!(
         Review,
         "SELECT rate, content FROM reviews WHERE book_id = $1 AND user_id = $2",
         book_id,
@@ -49,22 +46,16 @@ pub async fn get(book_id: Uuid, user_id: Uuid, executor: impl PgExecutor<'_>) ->
     )
     .fetch_one(executor)
     .await
-    .unwrap();
-
-    Ok(review)
 }
 
 pub async fn get_by_book(book_id: Uuid, executor: impl PgExecutor<'_>) -> Result<Vec<Review>> {
-    let reviews = sqlx::query_as!(
+    sqlx::query_as!(
         Review,
         "SELECT rate, content FROM reviews WHERE book_id = $1",
         book_id,
     )
     .fetch_all(executor)
     .await
-    .unwrap();
-
-    Ok(reviews)
 }
 
 #[derive(Deserialize, ToSchema)]
@@ -94,8 +85,7 @@ pub async fn update(
         params.content
     )
     .execute(executor)
-    .await
-    .unwrap();
+    .await?;
 
     Ok(())
 }
@@ -107,8 +97,7 @@ pub async fn delete(book_id: Uuid, user_id: Uuid, executor: impl PgExecutor<'_>)
         user_id
     )
     .execute(executor)
-    .await
-    .unwrap();
+    .await?;
 
     Ok(())
 }

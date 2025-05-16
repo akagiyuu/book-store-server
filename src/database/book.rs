@@ -1,11 +1,9 @@
 use async_stream::try_stream;
 use futures::{Stream, StreamExt};
 use serde::{Deserialize, Serialize};
-use sqlx::{PgPool, PgTransaction};
+use sqlx::{PgPool, PgTransaction, Result};
 use utoipa::ToSchema;
 use uuid::Uuid;
-
-use crate::Result;
 
 use super::{author, category};
 
@@ -23,7 +21,7 @@ async fn insert_author(
     author: &author::InsertAuthor,
     transaction: &mut PgTransaction<'_>,
 ) -> Result<()> {
-    let author_id = author::insert(author, &mut **transaction).await.unwrap();
+    let author_id = author::insert(author, &mut **transaction).await?;
 
     sqlx::query!(
         "INSERT INTO book_authors(book_id, author_id) VALUES($1, $2)",
@@ -31,8 +29,7 @@ async fn insert_author(
         author_id
     )
     .execute(&mut **transaction)
-    .await
-    .unwrap();
+    .await?;
 
     Ok(())
 }
@@ -42,9 +39,7 @@ async fn insert_category(
     category: &category::InsertCategory,
     transaction: &mut PgTransaction<'_>,
 ) -> Result<()> {
-    let category_id = category::insert(category, &mut **transaction)
-        .await
-        .unwrap();
+    let category_id = category::insert(category, &mut **transaction).await?;
 
     sqlx::query!(
         "INSERT INTO book_categories(book_id, category_id) VALUES($1, $2)",
@@ -52,14 +47,13 @@ async fn insert_category(
         category_id
     )
     .execute(&mut **transaction)
-    .await
-    .unwrap();
+    .await?;
 
     Ok(())
 }
 
 pub async fn insert(params: InsertBook, pool: &PgPool) -> Result<Uuid> {
-    let mut transaction = pool.begin().await.unwrap();
+    let mut transaction = pool.begin().await?;
 
     let id = sqlx::query_scalar!(
         r#"
@@ -72,20 +66,17 @@ pub async fn insert(params: InsertBook, pool: &PgPool) -> Result<Uuid> {
         params.description
     )
     .fetch_one(&mut *transaction)
-    .await
-    .unwrap();
+    .await?;
 
     for author in &params.authors {
-        insert_author(id, author, &mut transaction).await.unwrap();
+        insert_author(id, author, &mut transaction).await?;
     }
 
     for category in &params.categories {
-        insert_category(id, category, &mut transaction)
-            .await
-            .unwrap();
+        insert_category(id, category, &mut transaction).await?;
     }
 
-    transaction.commit().await.unwrap();
+    transaction.commit().await?;
 
     Ok(id)
 }
@@ -101,22 +92,19 @@ pub struct Book {
 }
 
 pub async fn get(id: Uuid, pool: &PgPool) -> Result<Book> {
-    let mut transaction = pool.begin().await.unwrap();
+    let mut transaction = pool.begin().await?;
 
     let book_raw = sqlx::query!(
         "SELECT id, isbn, title, description FROM books WHERE id = $1",
         id
     )
     .fetch_one(&mut *transaction)
-    .await
-    .unwrap();
+    .await?;
 
     let authors = author::get_by_book_id(id, &mut *transaction).await?;
-    let categories = category::get_by_book_id(id, &mut *transaction)
-        .await
-        .unwrap();
+    let categories = category::get_by_book_id(id, &mut *transaction).await?;
 
-    transaction.commit().await.unwrap();
+    transaction.commit().await?;
 
     Ok(Book {
         id: book_raw.id,
@@ -133,16 +121,14 @@ pub fn get_all(pool: &PgPool) -> impl Stream<Item = Result<Book>> {
 
     try_stream! {
         while let Some(book_raw) = books_raw.next().await {
-            let book_raw = book_raw.unwrap();
+            let book_raw = book_raw?;
 
-            let mut transaction = pool.begin().await.unwrap();
+            let mut transaction = pool.begin().await?;
 
             let authors = author::get_by_book_id(book_raw.id, &mut *transaction).await?;
-            let categories = category::get_by_book_id(book_raw.id, &mut *transaction)
-                .await
-                .unwrap();
+            let categories = category::get_by_book_id(book_raw.id, &mut *transaction).await?;
 
-            transaction.commit().await.unwrap();
+            transaction.commit().await?;
 
             yield Book {
                 id: book_raw.id,
@@ -163,11 +149,10 @@ async fn update_author(
 ) -> Result<()> {
     sqlx::query!("DELETE FROM book_authors WHERE book_id = $1", id)
         .execute(&mut **transaction)
-        .await
-        .unwrap();
+        .await?;
 
     for author in authors {
-        insert_author(id, author, transaction).await.unwrap();
+        insert_author(id, author, transaction).await?;
     }
 
     Ok(())
@@ -180,11 +165,10 @@ async fn update_category(
 ) -> Result<()> {
     sqlx::query!("DELETE FROM book_categories WHERE book_id = $1", id)
         .execute(&mut **transaction)
-        .await
-        .unwrap();
+        .await?;
 
     for category in categories {
-        insert_category(id, category, transaction).await.unwrap();
+        insert_category(id, category, transaction).await?;
     }
 
     Ok(())
@@ -200,7 +184,7 @@ pub struct UpdateBook {
 }
 
 pub async fn update(id: Uuid, params: &UpdateBook, pool: &PgPool) -> Result<()> {
-    let mut transaction = pool.begin().await.unwrap();
+    let mut transaction = pool.begin().await?;
 
     sqlx::query!(
         r#"
@@ -218,20 +202,17 @@ pub async fn update(id: Uuid, params: &UpdateBook, pool: &PgPool) -> Result<()> 
         params.description
     )
     .execute(&mut *transaction)
-    .await
-    .unwrap();
+    .await?;
 
     if let Some(authors) = &params.authors {
-        update_author(id, authors, &mut transaction).await.unwrap();
+        update_author(id, authors, &mut transaction).await?;
     }
 
     if let Some(categories) = &params.categories {
-        update_category(id, categories, &mut transaction)
-            .await
-            .unwrap();
+        update_category(id, categories, &mut transaction).await?;
     }
 
-    transaction.commit().await.unwrap();
+    transaction.commit().await?;
 
     Ok(())
 }
@@ -239,8 +220,7 @@ pub async fn update(id: Uuid, params: &UpdateBook, pool: &PgPool) -> Result<()> 
 pub async fn delete(id: Uuid, database: &PgPool) -> Result<()> {
     sqlx::query!("DELETE FROM books WHERE id = $1", id)
         .execute(database)
-        .await
-        .unwrap();
+        .await?;
 
     Ok(())
 }

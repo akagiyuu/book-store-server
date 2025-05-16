@@ -27,9 +27,7 @@ pub async fn get_by_book(
     State(state): State<Arc<ApiState>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<Vec<Review>>> {
-    let reviews = database::review::get_by_book(id, &state.database)
-        .await
-        .unwrap();
+    let reviews = database::review::get_by_book(id, &state.database).await?;
 
     Ok(Json(reviews))
 }

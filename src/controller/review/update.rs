@@ -29,9 +29,7 @@ pub async fn update(
     Path(book_id): Path<Uuid>,
     Json(req): Json<UpdateReview>,
 ) -> Result<()> {
-    database::review::update(book_id, auth_ctx.sub, &req, &state.database)
-        .await
-        .unwrap();
+    database::review::update(book_id, auth_ctx.sub, &req, &state.database).await?;
 
     Ok(())
 }

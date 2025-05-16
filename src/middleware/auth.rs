@@ -19,7 +19,7 @@ use uuid::Uuid;
 use crate::{
     Result,
     config::{CONFIG, KEYS},
-    error::Error,
+    error::AuthError,
     state::ApiState,
 };
 
@@ -38,7 +38,8 @@ impl AuthContext {
     }
 
     pub fn encode(&self) -> Result<String> {
-        let token = jsonwebtoken::encode(&Header::default(), self, &KEYS.encoding).unwrap();
+        let token = jsonwebtoken::encode(&Header::default(), self, &KEYS.encoding)
+            .map_err(anyhow::Error::from)?;
 
         Ok(token)
     }
@@ -50,13 +51,15 @@ impl FromRequestParts<Arc<ApiState>> for AuthContext {
     async fn from_request_parts(parts: &mut Parts, _: &Arc<ApiState>) -> Result<Self> {
         let TypedHeader(Authorization(bearer)) = parts
             .extract::<TypedHeader<Authorization<Bearer>>>()
-            .await
-            .unwrap();
+            .await?;
 
         let token = bearer.token();
         let token =
             jsonwebtoken::decode::<AuthContext>(token, &KEYS.decoding, &Validation::default())
-                .unwrap();
+                .map_err(|error| {
+                    tracing::error!(error = ?error);
+                    AuthError::InvalidAuthToken
+                })?;
 
         Ok(token.claims)
     }
@@ -90,9 +93,7 @@ macro_rules! auth_required {
             next: Next,
         ) -> Result<Response> {
             if get_role(auth_ctx.sub, &state.database).await? >= $role {
-                return Err(Error::Auth {
-                    message: "Unauthorized".to_string(),
-                });
+                return Err(AuthError::MissingPermission.into());
             }
 
             Ok(next.run(req).await)

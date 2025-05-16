@@ -8,6 +8,7 @@ use utoipa::ToSchema;
 
 use crate::config::CONFIG;
 use crate::database;
+use crate::error::AuthError;
 use crate::middleware::AuthContext;
 use crate::{Result, state::ApiState};
 
@@ -30,8 +31,8 @@ pub async fn login(
 ) -> Result<CookieJar> {
     let user = database::user::get(&request.email, &state.database).await?;
 
-    if !bcrypt::verify(request.password, &user.password).unwrap() {
-        panic!("Invalid password");
+    if !bcrypt::verify(request.password, &user.password).map_err(anyhow::Error::from)? {
+        return Err(AuthError::InvalidLoginData.into());
     }
 
     let auth_ctx = AuthContext::new(user.id);

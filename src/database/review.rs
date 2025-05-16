@@ -54,11 +54,15 @@ pub async fn get(book_id: Uuid, user_id: Uuid, executor: impl PgExecutor<'_>) ->
     Ok(review)
 }
 
-pub async fn get_all(executor: impl PgExecutor<'_>) -> Result<Vec<Review>> {
-    let reviews = sqlx::query_as!(Review, "SELECT rate, content FROM reviews")
-        .fetch_all(executor)
-        .await
-        .unwrap();
+pub async fn get_by_book(book_id: Uuid, executor: impl PgExecutor<'_>) -> Result<Vec<Review>> {
+    let reviews = sqlx::query_as!(
+        Review,
+        "SELECT rate, content FROM reviews WHERE book_id = $1",
+        book_id,
+    )
+    .fetch_all(executor)
+    .await
+    .unwrap();
 
     Ok(reviews)
 }

@@ -95,3 +95,23 @@ impl UpdateReview {
         Ok(())
     }
 }
+
+pub struct DeleteReview {
+    pub book_id: Uuid,
+    pub user_id: Uuid,
+}
+
+impl DeleteReview {
+    pub async fn delete(&self, executor: impl PgExecutor<'_>) -> Result<()> {
+        sqlx::query!(
+            "DELETE FROM reviews WHERE book_id = $1 AND user_id = $2",
+            self.book_id,
+            self.user_id
+        )
+        .execute(executor)
+        .await
+        .unwrap();
+
+        Ok(())
+    }
+}

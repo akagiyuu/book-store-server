@@ -1,3 +1,7 @@
+mod auth;
+
+pub use auth::*;
+
 use axum::{Json, http::StatusCode, response::IntoResponse};
 use axum_extra::typed_header::TypedHeaderRejection;
 use serde::Serialize;
@@ -6,18 +10,6 @@ use utoipa::ToSchema;
 #[derive(Serialize, ToSchema)]
 pub struct ErrorResponse {
     pub message: String,
-}
-
-#[derive(Debug, thiserror::Error)]
-pub enum AuthError {
-    #[error("Missing authentication token")]
-    MissingAuthToken,
-
-    #[error("Invalid authentication token")]
-    InvalidAuthToken,
-
-    #[error("Missing required permission")]
-    MissingPermission,
 }
 
 #[derive(Debug, thiserror::Error)]

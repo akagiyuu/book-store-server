@@ -39,6 +39,11 @@ impl Modify for SecurityAddon {
         controller::author::get_all,
         controller::author::update,
         controller::author::delete,
+        controller::category::insert,
+        controller::category::get,
+        controller::category::get_all,
+        controller::category::update,
+        controller::category::delete,
     ),
     modifiers(&SecurityAddon),
     components(schemas(crate::error::ErrorResponse))

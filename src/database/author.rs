@@ -68,6 +68,7 @@ pub async fn get_all(executor: impl PgExecutor<'_>) -> Result<Vec<Author>> {
     Ok(author)
 }
 
+#[derive(Deserialize, ToSchema)]
 pub struct UpdateAuthor {
     name: Option<String>,
 }

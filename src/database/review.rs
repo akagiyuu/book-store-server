@@ -64,3 +64,34 @@ impl Review {
         Ok(reviews)
     }
 }
+
+pub struct UpdateReview {
+    pub book_id: Uuid,
+    pub user_id: Uuid,
+    pub rate: Option<f32>,
+    pub content: Option<String>,
+}
+
+impl UpdateReview {
+    pub async fn update(&self, executor: impl PgExecutor<'_>) -> Result<()> {
+        sqlx::query!(
+            r#"
+            UPDATE reviews
+            SET 
+                rate = COALESCE(rate, $3),
+                content = COALESCE(content, $4),
+                update_at = now()
+            WHERE book_id = $1 AND user_id = $2
+        "#,
+            self.book_id,
+            self.user_id,
+            self.rate,
+            self.content
+        )
+        .execute(executor)
+        .await
+        .unwrap();
+
+        Ok(())
+    }
+}

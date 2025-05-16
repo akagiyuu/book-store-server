@@ -1,6 +1,7 @@
 pub mod auth;
-mod ping;
-pub mod book;
 pub mod author;
+pub mod book;
+pub mod category;
+mod ping;
 
 pub use ping::*;

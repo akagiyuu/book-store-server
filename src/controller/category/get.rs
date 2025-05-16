@@ -27,7 +27,7 @@ pub async fn get(
     State(state): State<Arc<ApiState>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<Category>> {
-    let book = database::category::get(id, &state.database).await?;
+    let category = database::category::get(id, &state.database).await?;
 
-    Ok(Json(book))
+    Ok(Json(category))
 }

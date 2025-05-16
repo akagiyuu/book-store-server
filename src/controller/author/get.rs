@@ -24,7 +24,7 @@ use crate::{
     )
 )]
 pub async fn get(State(state): State<Arc<ApiState>>, Path(id): Path<Uuid>) -> Result<Json<Author>> {
-    let book = database::author::get(id, &state.database).await?;
+    let author = database::author::get(id, &state.database).await?;
 
-    Ok(Json(book))
+    Ok(Json(author))
 }

@@ -18,9 +18,9 @@ use crate::{
     )
 )]
 pub async fn get_all(State(state): State<Arc<ApiState>>) -> Result<Json<Vec<Book>>> {
-    let book = database::book::get_all(&state.database)
+    let books = database::book::get_all(&state.database)
         .try_collect()
         .await?;
 
-    Ok(Json(book))
+    Ok(Json(books))
 }

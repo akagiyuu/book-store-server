@@ -15,7 +15,7 @@ pub struct ErrorResponse {
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("Database error: {0}")]
-    Database(sqlx::Error),
+    Database(#[from] sqlx::Error),
 
     #[error("{0}")]
     Auth(#[from] AuthError),

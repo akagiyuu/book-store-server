@@ -29,9 +29,7 @@ pub async fn get(
     Path(book_id): Path<Uuid>,
     Path(user_id): Path<Uuid>,
 ) -> Result<Json<Review>> {
-    let review = database::review::get(book_id, user_id, &state.database)
-        .await
-        .unwrap();
+    let review = database::review::get(book_id, user_id, &state.database).await?;
 
     Ok(Json(review))
 }

@@ -19,9 +19,7 @@ pub async fn delete(
     auth_ctx: AuthContext,
     Path(book_id): Path<Uuid>,
 ) -> Result<()> {
-    database::review::delete(book_id, auth_ctx.sub, &state.database)
-        .await
-        .unwrap();
+    database::review::delete(book_id, auth_ctx.sub, &state.database).await?;
 
     Ok(())
 }

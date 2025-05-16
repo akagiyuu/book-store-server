@@ -38,7 +38,8 @@ impl AuthContext {
     }
 
     pub fn encode(&self) -> Result<String> {
-        let token = jsonwebtoken::encode(&Header::default(), self, &KEYS.encoding).unwrap();
+        let token = jsonwebtoken::encode(&Header::default(), self, &KEYS.encoding)
+            .map_err(anyhow::Error::from)?;
 
         Ok(token)
     }

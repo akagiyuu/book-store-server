@@ -7,6 +7,7 @@ use serde::Deserialize;
 use utoipa::ToSchema;
 
 use crate::database;
+use crate::error::AuthError;
 use crate::middleware::AuthContext;
 use crate::{Result, config::CONFIG, state::ApiState};
 
@@ -34,7 +35,10 @@ pub async fn register(
         CONFIG.bcrypt_cost,
         CONFIG.bcrypt_salt,
     )
-    .unwrap()
+    .map_err(|error| {
+        tracing::error!(error =? error);
+        AuthError::InvalidLoginData
+    })?
     .to_string();
 
     let id = database::user::insert(

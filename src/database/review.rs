@@ -29,3 +29,38 @@ impl InsertReview {
         Ok(())
     }
 }
+
+pub struct Review {
+    pub book_id: Uuid,
+    pub user_id: Uuid,
+    pub rate: f32,
+    pub content: String,
+}
+
+impl Review {
+    pub async fn get(book_id: Uuid, user_id: Uuid, executor: impl PgExecutor<'_>) -> Result<Self> {
+        let review = sqlx::query_as!(
+            Self,
+            r#"SELECT book_id, user_id, rate, content FROM reviews WHERE book_id = $1 AND user_id = $2"#,
+            book_id,
+            user_id
+        )
+        .fetch_one(executor)
+        .await
+        .unwrap();
+
+        Ok(review)
+    }
+
+    pub async fn get_all(executor: impl PgExecutor<'_>) -> Result<Vec<Self>> {
+        let reviews = sqlx::query_as!(
+            Self,
+            r#"SELECT book_id, user_id, rate, content FROM reviews"#,
+        )
+        .fetch_all(executor)
+        .await
+        .unwrap();
+
+        Ok(reviews)
+    }
+}

@@ -8,7 +8,9 @@ use axum_extra::extract::{CookieJar, cookie::Cookie};
 use oauth2::{AuthorizationCode, CsrfToken, Scope, TokenResponse, reqwest::async_http_client};
 use serde::Deserialize;
 
-use crate::{Result, config::CONFIG, database, middleware::AuthContext, state::ApiState};
+use crate::{
+    Result, config::CONFIG, database, error::AuthError, middleware::AuthContext, state::ApiState,
+};
 
 pub async fn google(State(state): State<Arc<ApiState>>) -> impl IntoResponse {
     let (auth_url, _) = state
@@ -45,7 +47,11 @@ pub async fn authorized(
         .exchange_code(AuthorizationCode::new(query.code))
         .request_async(async_http_client)
         .await
-        .unwrap();
+        .map_err(|error| {
+            tracing::error!(error =? error);
+
+            AuthError::InvalidAuthToken
+        })?;
 
     let user = state
         .http_client
@@ -53,10 +59,18 @@ pub async fn authorized(
         .bearer_auth(token.access_token().secret())
         .send()
         .await
-        .unwrap()
+        .map_err(|error| {
+            tracing::error!(error =? error);
+
+            AuthError::InvalidAuthToken
+        })?
         .json::<User>()
         .await
-        .unwrap();
+        .map_err(|error| {
+            tracing::error!(error =? error);
+
+            AuthError::InvalidLoginData
+        })?;
 
     let id = if database::user::is_existed(&user.email, &state.database).await? {
         database::user::get(&user.email, &state.database).await?.id

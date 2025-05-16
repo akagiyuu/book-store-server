@@ -75,12 +75,17 @@ pub async fn get_all(executor: impl PgExecutor<'_>) -> Result<Vec<Category>> {
     Ok(category)
 }
 
+#[derive(Deserialize, ToSchema)]
 pub struct UpdateCategory {
     pub name: Option<String>,
     pub description: Option<String>,
 }
 
-pub async fn update(id: Uuid, params: &UpdateCategory, executor: impl PgExecutor<'_>) -> Result<()> {
+pub async fn update(
+    id: Uuid,
+    params: &UpdateCategory,
+    executor: impl PgExecutor<'_>,
+) -> Result<()> {
     sqlx::query!(
         r#"
             UPDATE categories

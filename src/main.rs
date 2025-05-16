@@ -58,7 +58,8 @@ fn build(state: Arc<ApiState>) -> Router {
         .merge(controller::auth::build())
         .merge(controller::book::build(state.clone()))
         .merge(controller::author::build(state.clone()))
-        .merge(controller::category::build(state.clone()));
+        .merge(controller::category::build(state.clone()))
+        .merge(controller::review::build(state.clone()));
 
     let router = router
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()));

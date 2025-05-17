@@ -53,9 +53,6 @@ pub struct Config {
     #[serde(default = "default_cors_domain")]
     pub cors_domain: String,
 
-    #[serde(default = "default_token_cookie")]
-    pub token_cookie: String,
-
     #[serde(default = "default_jwt_secret")]
     pub jwt_secret: String,
 

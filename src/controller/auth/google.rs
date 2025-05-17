@@ -9,6 +9,7 @@ use serde::Deserialize;
 
 use crate::{Result, database, error::AuthError, middleware::AuthContext, state::ApiState};
 
+#[utoipa::path(get, tag = "Auth", path = "/auth/google")]
 pub async fn google(State(state): State<Arc<ApiState>>) -> impl IntoResponse {
     let (auth_url, _) = state
         .google_oauth_client

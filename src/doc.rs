@@ -29,6 +29,7 @@ impl Modify for SecurityAddon {
         controller::ping,
         controller::register,
         controller::login,
+        controller::google,
         controller::insert_book,
         controller::get_book,
         controller::get_all_book,

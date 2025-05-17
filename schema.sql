@@ -52,12 +52,11 @@ CREATE TABLE IF NOT EXISTS users(
 );
 
 CREATE TABLE IF NOT EXISTS reviews(
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     book_id uuid NOT NULL references books(id) ON DELETE CASCADE,
     user_id uuid NOT NULL references users(id) ON DELETE CASCADE,
     rate real NOT NULL,
     content text NOT NULL,
     created_at timestamp NOT NULL DEFAULT now(),
-    update_at timestamp NOT NULL DEFAULT now(),
-
-    PRIMARY KEY (book_id, user_id)
+    update_at timestamp NOT NULL DEFAULT now()
 );

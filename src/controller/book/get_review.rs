@@ -23,7 +23,7 @@ use crate::{
         (status = 200, body = Vec<Review>)
     )
 )]
-pub async fn get_review_by_book(
+pub async fn get_book_review(
     State(state): State<Arc<ApiState>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<Vec<Review>>> {

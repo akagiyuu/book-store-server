@@ -16,14 +16,14 @@ use crate::{
 #[utoipa::path(
     post,
     tag = "Book",
-    path = "/book/{book_id}/review",
+    path = "/book/{id}/review",
     params(
-        ("book_id" = Uuid, Path, description = "Book id"),
+        ("id" = Uuid, Path, description = "Book id"),
     ),
     request_body = InsertReview,
     security(("jwt_token" = []))
 )]
-pub async fn insert_review(
+pub async fn insert_book_review(
     State(state): State<Arc<ApiState>>,
     auth_ctx: AuthContext,
     Path(book_id): Path<Uuid>,

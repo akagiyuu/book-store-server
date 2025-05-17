@@ -95,7 +95,7 @@ macro_rules! auth_required {
             req: Request,
             next: Next,
         ) -> Result<Response> {
-            if get_role(auth_ctx.sub, &state.database).await? >= $role {
+            if get_role(auth_ctx.sub, &state.database).await? < $role {
                 return Err(AuthError::MissingPermission.into());
             }
 

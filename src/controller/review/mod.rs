@@ -16,15 +16,12 @@ pub use update::*;
 
 pub fn build(state: Arc<ApiState>) -> Router<Arc<ApiState>> {
     Router::new()
-        .route("/book/{book_id}/review", routing::patch(update_review))
-        .route("/book/{book_id}/review", routing::delete(delete_review))
+        .route("/review/{id}", routing::patch(update_review))
+        .route("/review/{id}", routing::delete(delete_review))
         .layer(axum::middleware::from_fn_with_state(
             state,
             middleware::user_required,
         ))
-        .route("/book/{book_id}/review/{user_id}", routing::get(get_review))
-        .route(
-            "/book/{book_id}/review/{user_id}/judge",
-            routing::get(judge),
-        )
+        .route("/review/{id}", routing::get(get_review))
+        .route("/review/{id}/judge", routing::get(judge))
 }

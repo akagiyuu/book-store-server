@@ -19,11 +19,10 @@ pub struct Judgement {
 
 #[utoipa::path(
     get,
-    tag = "Book",
-    path = "/book/{book_id}/review/{user_id}/judge",
+    tag = "Review",
+    path = "/review/{id}/judge",
     params(
-        ("book_id" = Uuid, Path, description = "Book id"),
-        ("user_id" = Uuid, Path, description = "User id"),
+        ("id" = Uuid, Path, description = "Review id"),
     ),
     responses(
         (status = 200, body = Judgement)
@@ -31,8 +30,7 @@ pub struct Judgement {
 )]
 pub async fn judge(
     State(state): State<Arc<ApiState>>,
-    Path(book_id): Path<Uuid>,
-    Path(user_id): Path<Uuid>,
+    Path(id): Path<Uuid>,
 ) -> Result<Json<Judgement>> {
     todo!()
     // let review = database::review::get(book_id, user_id, &state.database).await?;

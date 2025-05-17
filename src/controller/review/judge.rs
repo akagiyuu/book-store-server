@@ -32,28 +32,27 @@ pub async fn judge(
     State(state): State<Arc<ApiState>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<Judgement>> {
-    todo!()
-    // let review = database::review::get(book_id, user_id, &state.database).await?;
-    //
-    // let ollama = Ollama::new(CONFIG.ollama_host.clone(), CONFIG.ollama_port);
-    //
-    // let model = "llama2:latest".to_string();
-    // let prompt = format!(
-    //     "Judge this review, outputing the score reprensent the positive and negative of the reivew, also give me the reason. The review is: {}",
-    //     review.content
-    // );
-    //
-    // let response = ollama
-    //     .generate(GenerationRequest::new(model, prompt))
-    //     .await
-    //     .unwrap()
-    //     .response;
-    //
-    // let (score_raw, reason) = response.split_once("\n\n").unwrap();
-    // let score = score_raw.parse().unwrap();
-    //
-    // Ok(Json(Judgement {
-    //     score,
-    //     reason: reason.to_string(),
-    // }))
+    let review = database::review::get(id, &state.database).await?;
+
+    let ollama = Ollama::new(CONFIG.ollama_host.clone(), CONFIG.ollama_port);
+
+    let model = "llama2:latest".to_string();
+    let prompt = format!(
+        "Judge this review, outputing the score reprensent the positive and negative of the reivew, also give me the reason. The review is: {}",
+        review.content
+    );
+
+    let response = ollama
+        .generate(GenerationRequest::new(model, prompt))
+        .await
+        .unwrap()
+        .response;
+
+    let (score_raw, reason) = response.split_once("\n\n").unwrap();
+    let score = score_raw.parse().unwrap();
+
+    Ok(Json(Judgement {
+        score,
+        reason: reason.to_string(),
+    }))
 }

@@ -23,7 +23,10 @@ use crate::{
         (status = 200, body = Book)
     )
 )]
-pub async fn get(State(state): State<Arc<ApiState>>, Path(id): Path<Uuid>) -> Result<Json<Book>> {
+pub async fn get_book(
+    State(state): State<Arc<ApiState>>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<Book>> {
     let book = database::book::get(id, &state.database).await?;
 
     Ok(Json(book))

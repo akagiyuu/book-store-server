@@ -22,7 +22,7 @@ use crate::{
     request_body = UpdateAuthor,
     security(("jwt_token" = []))
 )]
-pub async fn update(
+pub async fn update_author(
     State(state): State<Arc<ApiState>>,
     Path(id): Path<Uuid>,
     Json(req): Json<UpdateAuthor>,

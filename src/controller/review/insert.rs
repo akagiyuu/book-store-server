@@ -23,7 +23,7 @@ use crate::{
     request_body = InsertReview,
     security(("jwt_token" = []))
 )]
-pub async fn insert(
+pub async fn insert_review(
     State(state): State<Arc<ApiState>>,
     auth_ctx: AuthContext,
     Path(book_id): Path<Uuid>,

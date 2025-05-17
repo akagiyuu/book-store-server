@@ -23,7 +23,7 @@ use crate::{
     request_body = UpdateReview,
     security(("jwt_token" = []))
 )]
-pub async fn update(
+pub async fn update_review(
     State(state): State<Arc<ApiState>>,
     auth_ctx: AuthContext,
     Path(book_id): Path<Uuid>,

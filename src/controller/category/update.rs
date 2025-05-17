@@ -22,7 +22,7 @@ use crate::{
     request_body = UpdateCategory,
     security(("jwt_token" = []))
 )]
-pub async fn update(
+pub async fn update_category(
     State(state): State<Arc<ApiState>>,
     Path(id): Path<Uuid>,
     Json(req): Json<UpdateCategory>,

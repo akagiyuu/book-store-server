@@ -14,7 +14,7 @@ use crate::{Result, database, state::ApiState};
     ),
     security(("jwt_token" = []))
 )]
-pub async fn delete(State(state): State<Arc<ApiState>>, Path(id): Path<Uuid>) -> Result<()> {
+pub async fn delete_author(State(state): State<Arc<ApiState>>, Path(id): Path<Uuid>) -> Result<()> {
     database::author::delete(id, &state.database).await?;
 
     Ok(())

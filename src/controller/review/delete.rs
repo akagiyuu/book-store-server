@@ -14,7 +14,7 @@ use crate::{Result, database, middleware::AuthContext, state::ApiState};
     ),
     security(("jwt_token" = []))
 )]
-pub async fn delete(
+pub async fn delete_review(
     State(state): State<Arc<ApiState>>,
     auth_ctx: AuthContext,
     Path(book_id): Path<Uuid>,

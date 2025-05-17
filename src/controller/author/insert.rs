@@ -15,7 +15,7 @@ use crate::{
     request_body = InsertAuthor,
     security(("jwt_token" = []))
 )]
-pub async fn insert(
+pub async fn insert_author(
     State(state): State<Arc<ApiState>>,
     Json(req): Json<InsertAuthor>,
 ) -> Result<()> {

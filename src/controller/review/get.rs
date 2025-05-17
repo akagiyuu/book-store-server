@@ -24,7 +24,7 @@ use crate::{
         (status = 200, body = Author)
     )
 )]
-pub async fn get(
+pub async fn get_review(
     State(state): State<Arc<ApiState>>,
     Path(book_id): Path<Uuid>,
     Path(user_id): Path<Uuid>,

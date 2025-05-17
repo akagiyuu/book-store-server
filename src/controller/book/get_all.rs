@@ -17,7 +17,7 @@ use crate::{
         (status = 200, body = Vec<Book>)
     )
 )]
-pub async fn get_all(State(state): State<Arc<ApiState>>) -> Result<Json<Vec<Book>>> {
+pub async fn get_all_book(State(state): State<Arc<ApiState>>) -> Result<Json<Vec<Book>>> {
     let books = database::book::get_all(&state.database)
         .try_collect()
         .await?;

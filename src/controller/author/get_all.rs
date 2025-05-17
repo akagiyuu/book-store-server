@@ -16,7 +16,7 @@ use crate::{
         (status = 200, body = Vec<Author>)
     )
 )]
-pub async fn get_all(State(state): State<Arc<ApiState>>) -> Result<Json<Vec<Author>>> {
+pub async fn get_all_author(State(state): State<Arc<ApiState>>) -> Result<Json<Vec<Author>>> {
     let authors = database::author::get_all(&state.database).await?;
 
     Ok(Json(authors))

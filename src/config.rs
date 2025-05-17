@@ -11,10 +11,6 @@ fn default_cors_domain() -> String {
     "http://localhost:3000".to_string()
 }
 
-fn default_token_cookie() -> String {
-    "token".to_string()
-}
-
 fn default_jwt_secret() -> String {
     "secret".to_string()
 }

@@ -15,7 +15,7 @@ use crate::{
 #[utoipa::path(
     get,
     tag = "Category",
-    path = "/category/:id",
+    path = "/category/{id}",
     params(
         ("id" = Uuid, Path, description = "Category id")
     ),

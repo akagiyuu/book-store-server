@@ -15,7 +15,7 @@ use crate::{
 #[utoipa::path(
     patch,
     tag = "Author",
-    path = "/author",
+    path = "/author/{id}",
     params(
         ("id" = Uuid, Path, description = "Author id")
     ),

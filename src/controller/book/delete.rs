@@ -8,7 +8,7 @@ use crate::{Result, database, state::ApiState};
 #[utoipa::path(
     delete,
     tag = "Book",
-    path = "/book/:id",
+    path = "/book/{id}",
     params(
         ("id" = Uuid, Path, description = "Book id")
     ),

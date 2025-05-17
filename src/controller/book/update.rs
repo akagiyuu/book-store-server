@@ -11,7 +11,7 @@ use crate::{Result, database::book, state::ApiState};
 #[utoipa::path(
     patch,
     tag = "Book",
-    path = "/book",
+    path = "/book/{id}",
     params(
         ("id" = Uuid, Path, description = "Book id")
     ),

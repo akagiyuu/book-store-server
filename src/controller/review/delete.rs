@@ -8,7 +8,7 @@ use crate::{Result, database, middleware::AuthContext, state::ApiState};
 #[utoipa::path(
     delete,
     tag = "Book",
-    path = "/book/:book_id/review",
+    path = "/book/{book_id}/review",
     params(
         ("book_id" = Uuid, Path, description = "Book id"),
     ),

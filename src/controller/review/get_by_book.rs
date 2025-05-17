@@ -15,7 +15,7 @@ use crate::{
 #[utoipa::path(
     get,
     tag = "Book",
-    path = "/book/:id/review",
+    path = "/book/{id}/review",
     params(
         ("id" = Uuid, Path, description = "Book id"),
     ),

@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use axum::{Json, extract::State};
+use uuid::Uuid;
 
 use crate::{
     Result,
@@ -13,13 +14,16 @@ use crate::{
     tag = "Category",
     path = "/category",
     request_body = InsertCategory,
+    responses(
+        (status = 200, body = Uuid)
+    ),
     security(("jwt_token" = []))
 )]
 pub async fn insert_category(
     State(state): State<Arc<ApiState>>,
     Json(req): Json<InsertCategory>,
-) -> Result<()> {
-    database::category::insert(&req, &state.database).await?;
+) -> Result<Json<Uuid>> {
+    let id = database::category::insert(&req, &state.database).await?;
 
-    Ok(())
+    Ok(Json(id))
 }

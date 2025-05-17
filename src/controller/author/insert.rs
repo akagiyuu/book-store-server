@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use axum::{Json, extract::State};
+use uuid::Uuid;
 
 use crate::{
     Result,
@@ -13,13 +14,16 @@ use crate::{
     tag = "Author",
     path = "/author",
     request_body = InsertAuthor,
+    responses(
+        (status = 200, body = Uuid)
+    ),
     security(("jwt_token" = []))
 )]
 pub async fn insert_author(
     State(state): State<Arc<ApiState>>,
     Json(req): Json<InsertAuthor>,
-) -> Result<()> {
-    database::author::insert(&req, &state.database).await?;
+) -> Result<Json<Uuid>> {
+    let id = database::author::insert(&req, &state.database).await?;
 
-    Ok(())
+    Ok(Json(id))
 }

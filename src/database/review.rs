@@ -33,16 +33,22 @@ pub async fn insert(
 
 #[derive(Serialize, ToSchema)]
 pub struct Review {
+    pub book_id: Uuid,
+    pub user_email: String,
     pub rate: f32,
     pub content: String,
 }
 
-pub async fn get(book_id: Uuid, user_id: Uuid, executor: impl PgExecutor<'_>) -> Result<Review> {
+pub async fn get(id: Uuid, executor: impl PgExecutor<'_>) -> Result<Review> {
     sqlx::query_as!(
         Review,
-        "SELECT rate, content FROM reviews WHERE book_id = $1 AND user_id = $2",
-        book_id,
-        user_id
+        r#"
+            SELECT book_id, users.email as user_email, rate, content
+            FROM reviews
+            INNER JOIN users ON users.id = reviews.user_id
+            WHERE reviews.id = $1
+        "#,
+        id
     )
     .fetch_one(executor)
     .await
@@ -51,8 +57,13 @@ pub async fn get(book_id: Uuid, user_id: Uuid, executor: impl PgExecutor<'_>) ->
 pub async fn get_by_book(book_id: Uuid, executor: impl PgExecutor<'_>) -> Result<Vec<Review>> {
     sqlx::query_as!(
         Review,
-        "SELECT rate, content FROM reviews WHERE book_id = $1",
-        book_id,
+        r#"
+            SELECT book_id, users.email as user_email, rate, content
+            FROM reviews
+            INNER JOIN users ON users.id = reviews.user_id
+            WHERE book_id = $1
+        "#,
+        book_id
     )
     .fetch_all(executor)
     .await
@@ -65,7 +76,7 @@ pub struct UpdateReview {
 }
 
 pub async fn update(
-    book_id: Uuid,
+    id: Uuid,
     user_id: Uuid,
     params: &UpdateReview,
     executor: impl PgExecutor<'_>,
@@ -77,9 +88,9 @@ pub async fn update(
                 rate = COALESCE(rate, $3),
                 content = COALESCE(content, $4),
                 update_at = now()
-            WHERE book_id = $1 AND user_id = $2
+            WHERE id = $1 AND user_id = $2
         "#,
-        book_id,
+        id,
         user_id,
         params.rate,
         params.content
@@ -90,10 +101,10 @@ pub async fn update(
     Ok(())
 }
 
-pub async fn delete(book_id: Uuid, user_id: Uuid, executor: impl PgExecutor<'_>) -> Result<()> {
+pub async fn delete(id: Uuid, user_id: Uuid, executor: impl PgExecutor<'_>) -> Result<()> {
     sqlx::query!(
-        "DELETE FROM reviews WHERE book_id = $1 AND user_id = $2",
-        book_id,
+        "DELETE FROM reviews WHERE id = $1 AND user_id = $2",
+        id,
         user_id
     )
     .execute(executor)

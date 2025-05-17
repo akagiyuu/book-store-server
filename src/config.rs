@@ -39,6 +39,10 @@ const fn default_ollama_port() -> u16 {
     11434
 }
 
+fn default_ollama_model() -> String {
+    "judge".to_string()
+}
+
 #[derive(Deserialize)]
 pub struct Config {
     pub database_url: String,
@@ -73,6 +77,9 @@ pub struct Config {
 
     #[serde(default = "default_ollama_port")]
     pub ollama_port: u16,
+
+    #[serde(default = "default_ollama_model")]
+    pub ollama_model: String,
 }
 
 pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {

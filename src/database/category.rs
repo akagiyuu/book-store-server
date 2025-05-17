@@ -63,7 +63,6 @@ pub async fn get_all(executor: impl PgExecutor<'_>) -> Result<Vec<Category>> {
 
 #[derive(Deserialize, ToSchema)]
 pub struct UpdateCategory {
-    pub name: Option<String>,
     pub description: Option<String>,
 }
 
@@ -76,13 +75,11 @@ pub async fn update(
         r#"
             UPDATE categories
             SET
-                name = COALESCE(name, $2),
-                description = COALESCE(description, $3),
+                description = COALESCE($2, description),
                 update_at = now()
             WHERE id = $1
         "#,
         id,
-        params.name,
         params.description
     )
     .execute(executor)

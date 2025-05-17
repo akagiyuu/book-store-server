@@ -16,9 +16,9 @@ use crate::{
 #[utoipa::path(
     patch,
     tag = "Book",
-    path = "/book/{book_id}/review",
+    path = "/review/{id}",
     params(
-        ("book_id" = Uuid, Path, description = "Book id"),
+        ("id" = Uuid, Path, description = "Review id"),
     ),
     request_body = UpdateReview,
     security(("jwt_token" = []))
@@ -26,10 +26,10 @@ use crate::{
 pub async fn update_review(
     State(state): State<Arc<ApiState>>,
     auth_ctx: AuthContext,
-    Path(book_id): Path<Uuid>,
+    Path(id): Path<Uuid>,
     Json(req): Json<UpdateReview>,
 ) -> Result<()> {
-    database::review::update(book_id, auth_ctx.sub, &req, &state.database).await?;
+    database::review::update(id, auth_ctx.sub, &req, &state.database).await?;
 
     Ok(())
 }

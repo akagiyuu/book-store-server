@@ -16,9 +16,9 @@ use crate::{
 #[utoipa::path(
     post,
     tag = "Book",
-    path = "/book/{book_id}/review",
+    path = "/book/{id}/review",
     params(
-        ("book_id" = Uuid, Path, description = "Book id"),
+        ("id" = Uuid, Path, description = "Book id"),
     ),
     request_body = InsertReview,
     security(("jwt_token" = []))

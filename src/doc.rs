@@ -38,7 +38,6 @@ impl Modify for SecurityAddon {
         controller::insert_author,
         controller::get_author,
         controller::get_all_author,
-        controller::update_author,
         controller::delete_author,
         controller::insert_category,
         controller::get_category,

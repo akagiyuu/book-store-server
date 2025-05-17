@@ -54,29 +54,6 @@ pub async fn get_all(executor: impl PgExecutor<'_>) -> Result<Vec<Author>> {
         .await
 }
 
-#[derive(Deserialize, ToSchema)]
-pub struct UpdateAuthor {
-    name: Option<String>,
-}
-
-pub async fn update(id: Uuid, params: &UpdateAuthor, executor: impl PgExecutor<'_>) -> Result<()> {
-    sqlx::query!(
-        r#"
-            UPDATE authors
-            SET 
-                name = COALESCE(name, $2),
-                update_at = now()
-            WHERE id = $1
-        "#,
-        id,
-        params.name,
-    )
-    .execute(executor)
-    .await?;
-
-    Ok(())
-}
-
 pub async fn delete(id: Uuid, executor: impl PgExecutor<'_>) -> Result<()> {
     sqlx::query!("DELETE FROM authors WHERE id = $1", id)
         .execute(executor)

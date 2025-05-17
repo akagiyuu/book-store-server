@@ -11,6 +11,7 @@ use axum_extra::{
     TypedHeader,
     headers::{Authorization, authorization::Bearer},
 };
+use chrono::Local;
 use jsonwebtoken::{Header, Validation};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -31,9 +32,11 @@ pub struct AuthContext {
 
 impl AuthContext {
     pub fn new(id: Uuid) -> Self {
+        let now = Local::now().timestamp() as u64;
+
         Self {
             sub: id,
-            exp: CONFIG.jwt_expired_in,
+            exp: now + CONFIG.jwt_expired_in,
         }
     }
 
@@ -92,7 +95,7 @@ macro_rules! auth_required {
             req: Request,
             next: Next,
         ) -> Result<Response> {
-            if get_role(auth_ctx.sub, &state.database).await? >= $role {
+            if get_role(auth_ctx.sub, &state.database).await? < $role {
                 return Err(AuthError::MissingPermission.into());
             }
 

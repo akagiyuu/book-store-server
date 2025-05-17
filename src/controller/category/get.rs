@@ -15,7 +15,7 @@ use crate::{
 #[utoipa::path(
     get,
     tag = "Category",
-    path = "/category/:id",
+    path = "/category/{id}",
     params(
         ("id" = Uuid, Path, description = "Category id")
     ),
@@ -23,7 +23,7 @@ use crate::{
         (status = 200, body = Category)
     )
 )]
-pub async fn get(
+pub async fn get_category(
     State(state): State<Arc<ApiState>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<Category>> {

@@ -4,7 +4,6 @@ use axum::{
     extract::{Query, State},
     response::{IntoResponse, Redirect},
 };
-use axum_extra::extract::{CookieJar, cookie::Cookie};
 use oauth2::{AuthorizationCode, CsrfToken, Scope, TokenResponse, reqwest::async_http_client};
 use serde::Deserialize;
 
@@ -39,9 +38,8 @@ struct User {
 
 pub async fn authorized(
     Query(query): Query<AuthRequest>,
-    jar: CookieJar,
     State(state): State<Arc<ApiState>>,
-) -> Result<CookieJar> {
+) -> Result<String> {
     let token = state
         .google_oauth_client
         .exchange_code(AuthorizationCode::new(query.code))
@@ -86,7 +84,5 @@ pub async fn authorized(
     };
 
     let auth_ctx = AuthContext::new(id);
-    let token = auth_ctx.encode()?;
-
-    Ok(jar.add(Cookie::new(&CONFIG.token_cookie, token)))
+    auth_ctx.encode()
 }

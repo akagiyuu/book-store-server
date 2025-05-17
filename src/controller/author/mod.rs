@@ -18,13 +18,13 @@ pub use update::*;
 
 pub fn build(state: Arc<ApiState>) -> Router<Arc<ApiState>> {
     Router::new()
-        .route("/author", routing::post(insert))
-        .route("/author/{id}", routing::patch(update))
-        .route("/author/{id}", routing::delete(delete))
+        .route("/author", routing::post(insert_author))
+        .route("/author/{id}", routing::patch(update_author))
+        .route("/author/{id}", routing::delete(delete_author))
         .layer(axum::middleware::from_fn_with_state(
             state,
             middleware::admin_required,
         ))
-        .route("/author", routing::get(get_all))
-        .route("/author/{id}", routing::get(get))
+        .route("/author", routing::get(get_all_author))
+        .route("/author/{id}", routing::get(get_author))
 }

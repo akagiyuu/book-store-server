@@ -15,7 +15,7 @@ use crate::{
 #[utoipa::path(
     get,
     tag = "Book",
-    path = "/book/:book_id/review/:user_id",
+    path = "/book/{book_id}/review/{user_id}",
     params(
         ("book_id" = Uuid, Path, description = "Book id"),
         ("user_id" = Uuid, Path, description = "User id"),
@@ -24,7 +24,7 @@ use crate::{
         (status = 200, body = Author)
     )
 )]
-pub async fn get(
+pub async fn get_review(
     State(state): State<Arc<ApiState>>,
     Path(book_id): Path<Uuid>,
     Path(user_id): Path<Uuid>,

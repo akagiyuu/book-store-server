@@ -11,7 +11,7 @@ use crate::{Result, database::book, state::ApiState};
     request_body = book::InsertBook,
     security(("jwt_token" = []))
 )]
-pub async fn insert(
+pub async fn insert_book(
     State(state): State<Arc<ApiState>>,
     Json(req): Json<book::InsertBook>,
 ) -> Result<()> {

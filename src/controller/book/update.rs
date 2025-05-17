@@ -11,14 +11,14 @@ use crate::{Result, database::book, state::ApiState};
 #[utoipa::path(
     patch,
     tag = "Book",
-    path = "/book",
+    path = "/book/{id}",
     params(
         ("id" = Uuid, Path, description = "Book id")
     ),
     request_body = book::UpdateBook,
     security(("jwt_token" = []))
 )]
-pub async fn update(
+pub async fn update_book(
     State(state): State<Arc<ApiState>>,
     Path(id): Path<Uuid>,
     Json(req): Json<book::UpdateBook>,

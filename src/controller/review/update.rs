@@ -16,14 +16,14 @@ use crate::{
 #[utoipa::path(
     patch,
     tag = "Book",
-    path = "/book/:book_id/review",
+    path = "/book/{book_id}/review",
     params(
         ("book_id" = Uuid, Path, description = "Book id"),
     ),
     request_body = UpdateReview,
     security(("jwt_token" = []))
 )]
-pub async fn update(
+pub async fn update_review(
     State(state): State<Arc<ApiState>>,
     auth_ctx: AuthContext,
     Path(book_id): Path<Uuid>,

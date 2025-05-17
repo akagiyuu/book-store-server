@@ -16,7 +16,7 @@ use crate::{
         (status = 200, body = Vec<Category>)
     )
 )]
-pub async fn get_all(State(state): State<Arc<ApiState>>) -> Result<Json<Vec<Category>>> {
+pub async fn get_all_category(State(state): State<Arc<ApiState>>) -> Result<Json<Vec<Category>>> {
     let categories = database::category::get_all(&state.database).await?;
 
     Ok(Json(categories))

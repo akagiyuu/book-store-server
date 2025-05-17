@@ -15,7 +15,7 @@ use crate::{
 #[utoipa::path(
     get,
     tag = "Author",
-    path = "/author/:id",
+    path = "/author/{id}",
     params(
         ("id" = Uuid, Path, description = "Author id")
     ),
@@ -23,7 +23,7 @@ use crate::{
         (status = 200, body = Author)
     )
 )]
-pub async fn get(State(state): State<Arc<ApiState>>, Path(id): Path<Uuid>) -> Result<Json<Author>> {
+pub async fn get_author(State(state): State<Arc<ApiState>>, Path(id): Path<Uuid>) -> Result<Json<Author>> {
     let author = database::author::get(id, &state.database).await?;
 
     Ok(Json(author))

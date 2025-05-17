@@ -15,7 +15,7 @@ use crate::{
     request_body = InsertCategory,
     security(("jwt_token" = []))
 )]
-pub async fn insert(
+pub async fn insert_category(
     State(state): State<Arc<ApiState>>,
     Json(req): Json<InsertCategory>,
 ) -> Result<()> {

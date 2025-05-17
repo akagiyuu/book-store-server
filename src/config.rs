@@ -35,6 +35,14 @@ fn default_google_authorized_redirect_url() -> String {
     "http://localhost:3000/auth/google/authorized".to_string()
 }
 
+fn default_ollama_host() -> String {
+    "http://localhost".to_string()
+}
+
+const fn default_ollama_port() -> u16 {
+    11434
+}
+
 #[derive(Deserialize)]
 pub struct Config {
     pub database_url: String,
@@ -44,9 +52,6 @@ pub struct Config {
 
     #[serde(default = "default_cors_domain")]
     pub cors_domain: String,
-
-    #[serde(default = "default_token_cookie")]
-    pub token_cookie: String,
 
     #[serde(default = "default_jwt_secret")]
     pub jwt_secret: String,
@@ -66,6 +71,12 @@ pub struct Config {
 
     #[serde(default = "default_google_authorized_redirect_url")]
     pub google_authorized_redirect_url: String,
+
+    #[serde(default = "default_ollama_host")]
+    pub ollama_host: String,
+
+    #[serde(default = "default_ollama_port")]
+    pub ollama_port: u16,
 }
 
 pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {

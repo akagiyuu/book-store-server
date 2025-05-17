@@ -8,13 +8,13 @@ use crate::{Result, database, middleware::AuthContext, state::ApiState};
 #[utoipa::path(
     delete,
     tag = "Book",
-    path = "/book/:book_id/review",
+    path = "/book/{book_id}/review",
     params(
         ("book_id" = Uuid, Path, description = "Book id"),
     ),
     security(("jwt_token" = []))
 )]
-pub async fn delete(
+pub async fn delete_review(
     State(state): State<Arc<ApiState>>,
     auth_ctx: AuthContext,
     Path(book_id): Path<Uuid>,

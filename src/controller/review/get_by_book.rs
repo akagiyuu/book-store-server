@@ -15,7 +15,7 @@ use crate::{
 #[utoipa::path(
     get,
     tag = "Book",
-    path = "/book/:id/review",
+    path = "/book/{id}/review",
     params(
         ("id" = Uuid, Path, description = "Book id"),
     ),
@@ -23,7 +23,7 @@ use crate::{
         (status = 200, body = Vec<Review>)
     )
 )]
-pub async fn get_by_book(
+pub async fn get_review_by_book(
     State(state): State<Arc<ApiState>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<Vec<Review>>> {

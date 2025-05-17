@@ -8,13 +8,13 @@ use crate::{Result, database, state::ApiState};
 #[utoipa::path(
     delete,
     tag = "Author",
-    path = "/author/:id",
+    path = "/author/{id}",
     params(
         ("id" = Uuid, Path, description = "Author id")
     ),
     security(("jwt_token" = []))
 )]
-pub async fn delete(State(state): State<Arc<ApiState>>, Path(id): Path<Uuid>) -> Result<()> {
+pub async fn delete_author(State(state): State<Arc<ApiState>>, Path(id): Path<Uuid>) -> Result<()> {
     database::author::delete(id, &state.database).await?;
 
     Ok(())

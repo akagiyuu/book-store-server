@@ -40,7 +40,7 @@ const fn default_ollama_port() -> u16 {
 }
 
 fn default_ollama_model() -> String {
-    "reviewer".to_string()
+    "judge".to_string()
 }
 
 #[derive(Deserialize)]
